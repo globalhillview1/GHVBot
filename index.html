@@ -1,27 +1,89 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Helpdesk Dashboard (GitHub Pages)</title>
+  <meta charset="utf-8">
+  <title>Helpdesk Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 20px; background:#f7f9fc; }
+    h1 { margin-bottom: 20px; }
+    table { border-collapse: collapse; width: 100%; background:#fff; }
+    th, td { border: 1px solid #ddd; padding: 8px; font-size:14px; }
+    th { background:#0d6efd; color:#fff; text-align:left; position:sticky; top:0; }
+    tr:nth-child(even){ background:#f2f2f2; }
+    .status-Open { color:#fff; background:#111827; padding:2px 6px; border-radius:6px; }
+    .status-Resolved { color:#fff; background:#0d6efd; padding:2px 6px; border-radius:6px; }
+    .status-InProgress { color:#111; background:#f59e0b; padding:2px 6px; border-radius:6px; }
+    img { max-width:80px; border-radius:6px; }
+  </style>
 </head>
 <body>
-  <h1>Issues</h1>
-  <pre id="out">Loading…</pre>
+  <h1>Helpdesk Issues</h1>
+  <table id="grid">
+    <thead>
+      <tr>
+        <th>Tracking ID</th>
+        <th>Date & Time Raised</th>
+        <th>Tower</th>
+        <th>Flat</th>
+        <th>Issue</th>
+        <th>Description</th>
+        <th>Media</th>
+        <th>Status</th>
+        <th>Redressal Remark</th>
+        <th>User ID</th>
+        <th>Date & Time Resolved</th>
+        <th>Time Taken</th>
+        <th>Feedback</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    // Replace with your deployed Apps Script Web App URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUOUFEpImBgS0AiUPaSPdxHkFvt2SfONSoY_SyqCv0eiw0olWR82Gcjh7X6R8_63jm/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUOUFEpImBgS0AiUPaSPdxHkFvt2SfONSoY_SyqCv0eiw0olWR82Gcjh7X6R8_63jm/exec"; // e.g. https://script.google.com/macros/s/AKfycbx.../exec
 
     async function loadData() {
       try {
         const res = await fetch(SCRIPT_URL + "?mode=data", { cache: "no-store" });
-        if (!res.ok) throw new Error(res.status + " " + res.statusText);
-        const data = await res.json();
-        document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+        const rows = await res.json();
+        const tbody = document.querySelector("#grid tbody");
+        tbody.innerHTML = "";
+
+        rows.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r["Tracking ID"]||""}</td>
+            <td>${r["Date and Time Raised"]||""}</td>
+            <td>${r["Tower"]||""}</td>
+            <td>${r["Flat"]||""}</td>
+            <td>${r["Issue"]||""}</td>
+            <td>${r["Description"]||""}</td>
+            <td>${renderMedia(r["Media URL"])}</td>
+            <td><span class="status-${r["Status"]||""}">${r["Status"]||""}</span></td>
+            <td>${r["Redressal Remark"]||""}</td>
+            <td>${r["User ID"]||""}</td>
+            <td>${r["Date and Time Resolved"]||""}</td>
+            <td>${r["Time Taken"]||""}</td>
+            <td>${r["Feedback Rating"]||""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
       } catch (err) {
-        document.getElementById("out").textContent = "Error: " + err.message;
+        console.error(err);
+        document.querySelector("#grid tbody").innerHTML =
+          `<tr><td colspan="13">Error loading data: ${err.message}</td></tr>`;
       }
     }
+
+    function renderMedia(url) {
+      if (!url) return "";
+      if (url.match(/\.(jpe?g|png|gif|webp)$/i)) {
+        return `<img src="${url}" alt="media">`;
+      }
+      return `<a href="${url}" target="_blank">Open</a>`;
+    }
+
     loadData();
   </script>
 </body>
