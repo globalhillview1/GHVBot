@@ -1,22 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <title>AKRAM KHAN</title>
-  </head>
-  <body>
-    <iframe
-      src="https://script.google.com/macros/s/AKfycbzoM1ckQuGcLKXiFYiKEBlQGb24im0ynUhK0Gxj_322hmL5A8c1Xs-fuwKrqa74-ZWE/exec"
-      width="100%"
-      height="100%"
-      allowfullscreen="true"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-    ></iframe>
-    <script>
-      window.onload = function () {
-        document.querySelector('iframe').requestFullscreen().catch((err) => {
-          console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-        });
-      };
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <title>Helpdesk Dashboard (GitHub Pages)</title>
+</head>
+<body>
+  <h1>Issues</h1>
+  <pre id="out">Loading…</pre>
+
+  <script>
+    // Replace with your deployed Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_-9K8qDmOM-i1-siOJhq_G_vc5Eko5Rys5p41MNDCu6omSWVvgGCkm2p3PlkfkqUg/exec";
+
+    async function loadData() {
+      try {
+        const res = await fetch(SCRIPT_URL + "?mode=data", { cache: "no-store" });
+        if (!res.ok) throw new Error(res.status + " " + res.statusText);
+        const data = await res.json();
+        document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("out").textContent = "Error: " + err.message;
+      }
+    }
+    loadData();
+  </script>
+</body>
 </html>
