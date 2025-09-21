@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sign in | Helpdesk</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;margin:0;background:#f7f9fc;display:grid;place-items:center;min-height:100vh}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.06);padding:24px;max-width:420px;width:92%}
+    h1{margin:0 0 14px}
+    label{display:block;font-size:13px;color:#6b7280;margin:10px 0 6px}
+    input{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:15px}
+    button{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:#0d6efd;color:#fff;font-weight:700;cursor:pointer}
+    .err{display:none;margin-top:12px;background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;padding:10px;border-radius:10px}
+    .muted{color:#6b7280;margin-top:10px;font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign in</h1>
+    <label>Username</label>
+    <input id="u" autocomplete="username">
+    <label>Password</label>
+    <input id="p" type="password" autocomplete="current-password">
+    <button id="btn">Sign in</button>
+    <div id="err" class="err"></div>
+    <div class="muted">Tip: contact an admin if you forgot your password.</div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby713aGRz0p7xsPrWeeAxYJ5IslLLFNCKj4912rv6m5c61EIsZUMy6Z1NO6nk0yRXYb/exec";
+    const tok = localStorage.getItem("helpdesk_token");
+    if (tok) location.replace("./");
+
+    document.getElementById("btn").addEventListener("click", login);
+    document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+    async function login(){
+      const u = document.getElementById("u").value.trim();
+      const p = document.getElementById("p").value;
+      const err = document.getElementById("err"); err.style.display="none";
+      if(!u || !p){ show("Enter username & password"); return; }
+
+      try{
+        const url = `${SCRIPT_URL}?api=login&u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}`;
+        const r = await fetch(url, { cache:"no-store" });
+        const j = await r.json();
+        if(!j.ok) return show(j.error || "Login failed");
+
+        localStorage.setItem("helpdesk_token", j.token);
+        localStorage.setItem("helpdesk_user", j.user || "");
+        location.replace("./");
+      }catch(e){ show("Network error. Please try again."); }
+
+      function show(msg){ err.textContent = msg; err.style.display = "block"; }
+    }
+  </script>
+</body>
+</html>
