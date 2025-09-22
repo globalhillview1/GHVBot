@@ -1,34 +1,142 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Embedded Content</title>
-  </head>
-  <body>
-    <!-- 
-      IMPORTANT: You must replace 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL' with the URL 
-      of your own Apps Script Web App deployment.
-    -->
-    <iframe id="app-iframe"
-      src="https://script.google.com/macros/s/AKfycbzASMkQpMfNf8AWNA-5emd7W_vK_g88jQaJ6VmFOJ7Zca593U2VvKaib9I6W3nby-axBw/exec"
-      width="100%"
-      height="100%"
-      allowfullscreen="true"
-      allow="fullscreen"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
-    <div style="position:fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 999;">
-      <button onclick="requestFullscreen()" style="padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 8px; border: 1px solid #ccc; background-color: #f0f0f0;">
-        Go Fullscreen
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Global Hillview, Enviro Helpdesk Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
+  <style>
+    :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9;--header-h:72px;--controls-h:0px}
+    .dark{--bg:#0b1220;--card:#121a2a;--muted:#9aa4b2;--text:#e5e7eb;--border:#1f2937;--hover:#0f172a}
+    *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";margin:0;color:var(--text);background:var(--bg)}
+    header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+    .brand{display:flex;align-items:center;gap:10px}.brand img{height:32px;width:auto;border-radius:6px}header h1{font-size:20px;margin:0;font-weight:700}
+    .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+    .switch{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+    .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
+    .btn:hover{background:var(--hover)}.btn.primary{background:var(--blue);color:#fff;border-color:transparent}.btn.danger{background:var(--danger);color:#fff;border-color:transparent}.btn.small{padding:4px 8px;font-size:12px}
+    .cell-actions{display:flex;gap:6px;align-items:center}
+    .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+    .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
+    .card .value{font-size:20px;font-weight:800;margin-top:6px}
+    .card.total{border-left:6px solid var(--green)}.card.open{border-left:6px solid var(--gray)}.card.progress{border-left:6px solid var(--amber)}.card.resolved{border-left:6px solid var(--blue)}.card.avgtime{border-left:6px solid var(--cyan)}.card.avgrating{border-left:6px solid var(--violet)}
+    .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
+    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}tr:hover td{background:var(--hover)}
+    .sortable{cursor:pointer}.sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}.Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
+    .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}.media video,.media audio{width:140px;height:auto}
+    .pagination{display:flex;align-items:center;gap:8px;padding:10px}.spacer{flex:1}.muted{color:var(--muted);font-size:12px}
+    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}#lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
+    .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}.banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}.banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
+    @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Breez Global Hill View logo">
+      <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
+    </div>
+    <div class="toolbar">
+      <label class="switch"><span>Timezone:</span>
+        <select id="tzSelect"><option value="local">Local</option><option value="utc">UTC</option></select>
+      </label>
+      <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
+      <button id="toggleDark" class="btn">Dark mode</button>
+      <button class="btn" id="exportCsv">Export CSV</button>
+      <button class="btn danger" id="logoutBtn" style="display:inline-flex;align-items:center;gap:8px">
+        <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
       </button>
     </div>
-    <script>
-      function requestFullscreen() {
-        const iframe = document.getElementById('app-iframe');
-        if (iframe.requestFullscreen) {
-          iframe.requestFullscreen().catch(err => {
-            console.error(`Fullscreen request failed: ${err.message}`);
-          });
-        }
-      }
-    </script>
-  </body>
-</html>
+  </header>
+
+  <div id="controls" class="sticky-controls">
+    <section class="kpis">
+      <div class="card total"><div class="label">Total</div><div id="kpiTotal" class="value">0</div></div>
+      <div class="card open"><div class="label">Open</div><div id="kpiOpen" class="value">0</div></div>
+      <div class="card progress"><div class="label">In Progress</div><div id="kpiProgress" class="value">0</div></div>
+      <div class="card resolved"><div class="label">Resolved</div><div id="kpiResolved" class="value">0</div></div>
+      <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="value">0m</div></div>
+      <div class="card avgrating"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="value">0</div></div>
+    </section>
+    <section class="filters">
+      <select id="towerFilter"><option value="">All Towers</option></select>
+      <select id="statusFilter"><option value="">All Status</option><option value="Open">Open</option><option value="InProgress">In Progress</option><option value="Resolved">Resolved</option></select>
+      <input type="date" id="fromDate" /><input type="date" id="toDate" />
+      <input type="text" id="search" placeholder="Search (ID, flat, issue, remark, user...)" style="min-width:260px" />
+      <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px" /></label>
+      <button id="applyBtn" class="btn primary">Apply</button><button id="resetBtn" class="btn">Reset</button>
+    </section>
+  </div>
+
+  <div id="netError" class="banner error" style="display:none">Network error while fetching data.</div>
+  <div id="infoMsg" class="banner info" style="display:none">Showing cached data.</div>
+
+  <div class="tablewrap">
+    <table id="grid">
+      <thead>
+        <tr>
+          <th class="sortable" data-key="Tracking ID">Tracking ID</th>
+          <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
+          <th class="sortable" data-key="Tower">Tower</th>
+          <th class="sortable" data-key="Flat">Flat</th>
+          <th class="sortable" data-key="Issue">Issue</th>
+          <th class="sortable" data-key="Description">Description</th>
+          <th>Media</th>
+          <th class="sortable" data-key="Status">Status</th>
+          <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
+          <th class="sortable" data-key="User ID">User ID</th>
+          <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
+          <th class="sortable" data-key="__computed_time">Time Taken</th>
+          <th class="sortable" data-key="Feedback Rating">Feedback</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination">
+      <button class="btn" id="prevPage">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button class="btn" id="nextPage">Next</button>
+      <div class="spacer"></div><span id="rowCount" class="muted"></span>
+    </div>
+  </div>
+
+  <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
+
+  <script>
+    // ========= API base (GitHub Pages -> call CF Pages; CF Pages -> relative) =========
+    const API_BASE = (location.hostname.endsWith("github.io")) ? "https://ghvbot.pages.dev/api" : "/api";
+
+    const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false, session: null };
+
+    function getSessionToken(){
+      const urlToken = new URLSearchParams(location.search).get('session');
+      if (urlToken) { try { localStorage.setItem('session', urlToken); } catch(e){} return urlToken; }
+      try { const stored = localStorage.getItem('session'); if (stored) return stored; } catch(e){}
+      return null;
+    }
+
+    function apiGet(path, params={}){
+      const u = new URL(API_BASE + path, location.origin);
+      Object.entries(params).forEach(([k,v])=>{ if(v!=null) u.searchParams.set(k,v); });
+      return fetch(u.toString(), { method:"GET", headers:{ "Accept":"application/json" }, credentials:"omit" }).then(r=>r.json());
+    }
+    function apiPost(op, body){
+      const u = new URL(API_BASE, location.origin);
+      u.pathname = API_BASE.endsWith("/api") ? API_BASE : (API_BASE.replace(/\/$/,"") + "/api");
+      u.searchParams.set("mode", "api");
+      u.searchParams.set("op", op);
+      return fetch(u.toString(), { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ op, ...body }) }).then(r=>r.json());
+    }
+
+    function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
+    function fmtDate(d,tzMode){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; }
+    function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
+    function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
+    function renderMediaCell(url){ if(!url) return "<span class='muted'>No media</span>"; const esc=s=>String(s).replace(/
