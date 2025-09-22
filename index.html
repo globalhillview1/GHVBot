@@ -111,7 +111,7 @@
 
   <script>
     // ========= API base (GitHub Pages -> call CF Pages; CF Pages -> relative) =========
-    const API_BASE = (location.hostname.endsWith("github.io")) ? "https://ghvbot.pages.dev/api" : "/api";
+    const API_BASE = "/api";
 
     const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false, session: null };
 
