@@ -12,10 +12,7 @@
       --border:#e5e7eb; --hover:#f1f5f9;
       --header-h: 72px; --controls-h: 0px;
     }
-    .dark{
-      --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb;
-      --border:#1f2937; --hover:#0f172a;
-    }
+    .dark{ --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb; --border:#1f2937; --hover:#0f172a; }
     *{box-sizing:border-box}
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans"; margin:0; color:var(--text); background:var(--bg)}
     header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
@@ -29,7 +26,6 @@
     .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
     .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
     .btn.small{padding:4px 8px;font-size:12px}
-    .cell-actions{display:flex;gap:6px;align-items:center}
     .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
     .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
@@ -63,9 +59,8 @@
     .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
     .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
     .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
+    .edit{width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text)}
+    .cell-actions{display:flex; gap:6px; align-items:center}
     @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
   </style>
@@ -139,20 +134,16 @@
   <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
 
   <script>
-    /* ===================== Auth helpers ===================== */
-    function getSessionToken(){
-      try { return localStorage.getItem('session') || null; } catch(e){ return null; }
-    }
-    function setSessionToken(tok){
-      try {
-        if (tok) localStorage.setItem('session', tok);
-        else localStorage.removeItem('session');
-      } catch(e){}
-    }
+    /* ===== Auth helpers ===== */
+    const getTok = () => { try { return localStorage.getItem('session'); } catch(e){ return null; } };
+    const getRole = () => { try { return localStorage.getItem('role') || 'user'; } catch(e){ return 'user'; } };
+    const setTok  = (t) => { try { t ? localStorage.setItem('session', t) : localStorage.removeItem('session'); } catch(e){} };
+    const logoutNow = () => { setTok(null); localStorage.removeItem('role'); location.href='/login'; };
 
-    /* ===================== State & helpers (unchanged UI logic) ===================== */
+    /* ===== State ===== */
     const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
 
+    /* ===== Utils ===== */
     function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
     function fmtDate(d,tzMode){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; }
     function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
@@ -162,7 +153,7 @@
     function setStickyHeights(){ const h=document.querySelector('header'); const c=document.getElementById('controls'); if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px'); if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px'); }
     window.addEventListener('resize', setStickyHeights);
 
-    /* ===================== Data loading via Pages Function ===================== */
+    /* ===== Data ===== */
     async function fetchData(){
       try{
         const r = await fetch("/api?mode=data", { cache:"no-store" });
@@ -234,6 +225,70 @@
       render();
     }
 
+    function rowEditor(r){
+      if(!state.isAdmin){
+        return `
+          <td><span class="badge ${r["Status"]||""}">${r["Status"]||""}</span></td>
+          <td>${r["Redressal Remark"]||""}</td>
+        `;
+      }
+      const id = String(r["Tracking ID"]||"");
+      const st = String(r["Status"]||"");
+      const remark = (r["Redressal Remark"]||"").toString().replace(/"/g,'&quot;');
+      return `
+        <td>
+          <select class="edit" id="st-${id}">
+            <option value="Open" ${st==="Open"?"selected":""}>Open</option>
+            <option value="InProgress" ${st==="InProgress"?"selected":""}>In Progress</option>
+            <option value="Resolved" ${st==="Resolved"?"selected":""}>Resolved</option>
+          </select>
+        </td>
+        <td>
+          <div class="cell-actions">
+            <input class="edit" id="rm-${id}" value="${remark}" placeholder="Enter remark">
+            <button class="btn small primary" onclick="saveRow('${id}')">Save</button>
+          </div>
+        </td>
+      `;
+    }
+
+    async function saveRow(id){
+      const stEl = document.getElementById(`st-${id}`);
+      const rmEl = document.getElementById(`rm-${id}`);
+      if(!stEl || !rmEl) return;
+      const status = stEl.value;
+      const remark = rmEl.value;
+
+      const btn = stEl.nextElementSibling?.querySelector?.('button') || null;
+      if(btn){ btn.disabled=true; btn.textContent='Saving...'; }
+
+      try{
+        const res = await fetch('/api?mode=api&op=update', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id, status, remark })
+        });
+        if(!res.ok){ throw new Error(await res.text()); }
+        const out = await res.json().catch(()=>({ok:true}));
+        if(out && out.ok===false){ throw new Error(out.message||'Save failed'); }
+
+        // Update local copy so UI reflects change immediately
+        const row = state.all.find(x=>String(x["Tracking ID"])===String(id));
+        if(row){
+          row.Status = status;
+          row["Redressal Remark"] = remark;
+          if(status==="Resolved" && !row.__resolved){ row.__resolved = new Date(); row["Date and Time Resolved"] = row.__resolved.toISOString(); }
+          row.__computed_time = row.__raised && row.__resolved ? Math.max(0, row.__resolved - row.__raised) : row.__computed_time;
+        }
+        applyFilters();
+      }catch(e){
+        alert('Save failed: ' + e.message);
+      }finally{
+        if(btn){ btn.disabled=false; btn.textContent='Save'; }
+      }
+    }
+    window.saveRow = saveRow; // expose for onclick
+
     function render(){
       const {key, dir} = state.sort;
       const data = state.filtered.slice().sort((a,b)=>{
@@ -253,7 +308,7 @@
       const resolved = resolvedRows.length;
       const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
       const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
-      const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
+      const avgRating = ratings.length ? (ratings.reduce((a,b,)=>a+b,0)/ratings.length).toFixed(1) : "0";
 
       document.getElementById("kpiTotal").textContent = total;
       document.getElementById("kpiOpen").textContent = open;
@@ -269,7 +324,6 @@
         const raisedStr = fmtDate(r.__raised, state.tz);
         const resolvedStr = fmtDate(r.__resolved, state.tz);
         const timeStr = msToHuman(r.__computed_time);
-
         tr.innerHTML = `
           <td><span class="muted" style="border-bottom:1px dashed var(--muted); cursor:copy" title="Click to copy" onclick="navigator.clipboard.writeText('${String(r["Tracking ID"]||"")}')">${r["Tracking ID"]||""}</span></td>
           <td>${raisedStr}</td>
@@ -278,8 +332,7 @@
           <td>${r["Issue"]||""}</td>
           <td>${r["Description"]||""}</td>
           <td>${renderMediaCell(r["Media URL"])}</td>
-          <td><span class="badge ${r["Status"]||""}">${r["Status"]||""}</span></td>
-          <td>${r["Redressal Remark"]||""}</td>
+          ${rowEditor(r)}
           <td>${r["User ID"]||""}</td>
           <td>${resolvedStr}</td>
           <td>${timeStr}</td>
@@ -317,22 +370,11 @@
 
     function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
 
-    /* ===================== Auth gate + init ===================== */
-    function logoutNow(){
-      setSessionToken(null);
-      location.href = "/login";
-    }
-
-    async function loadAndRender(){
-      await fetchData();
-    }
-
+    /* ===== Init ===== */
     async function init(){
-      // 🔒 Require session before anything else
-      if (!getSessionToken()) {
-        location.href = "/login";
-        return;
-      }
+      // Require session
+      if (!getTok()) { location.href = "/login"; return; }
+      state.isAdmin = (getRole()==='admin');
 
       document.getElementById("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
       document.getElementById("exportCsv").addEventListener("click", exportCSV);
@@ -343,14 +385,12 @@
       document.getElementById("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
       document.getElementById("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
       document.getElementById("search").addEventListener("input", debounce(applyFilters, 250));
-      document.getElementById("autoRefresh").addEventListener("change", ()=>{});
       document.getElementById("logoutBtn").addEventListener("click", logoutNow);
 
-      await loadAndRender();
-      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) loadAndRender(); }, 60000);
+      await fetchData();
+      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) fetchData(); }, 60000);
       setStickyHeights();
     }
-
     window.onload = init;
 
     // Sorting handlers
