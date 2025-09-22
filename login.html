@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login | Helpdesk</title>
+  <style>
+    :root{--card:#ffffff;--bg:#f7f9fc;--border:#e5e7eb;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--danger:#ef4444}
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";background:var(--bg);color:var(--text)}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    h1{font-size:22px;margin:0 0 8px}p{color:var(--muted);margin:0 0 18px}
+    label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+    input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+    button{width:100%;margin-top:16px;padding:10px 12px;border-radius:10px;border:0;background:var(--blue);color:#fff;font-weight:700;cursor:pointer}
+    button[disabled]{opacity:.8;cursor:default}
+    .err{margin-top:10px;color:#fff;background:var(--danger);border-radius:10px;padding:8px 12px;display:none}
+    .muted{color:var(--muted);font-size:12px;margin-top:12px;text-align:center}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-3px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Sign in</h1>
+      <p>Enter your credentials to access the Helpdesk Dashboard.</p>
+
+      <label>Username</label>
+      <input id="u" type="text" autocomplete="username" autofocus>
+
+      <label>Password</label>
+      <input id="p" type="password" autocomplete="current-password">
+
+      <button id="btn" aria-busy="false" style="display:inline-flex;align-items:center;justify-content:center;gap:10px">
+        <span id="btnLabel">Sign in</span>
+        <span id="btnSpin" class="spinner" style="display:none"></span>
+      </button>
+
+      <div id="err" class="err"></div>
+      <div class="muted">Tip: ask an admin to create or reset your account.</div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = (location.hostname.endsWith("github.io")) ? "https://ghvbot.pages.dev/api" : "/api";
+    const btn   = document.getElementById('btn');
+    const label = document.getElementById('btnLabel');
+    const spin  = document.getElementById('btnSpin');
+
+    function setLoading(on){
+      btn.disabled = !!on;
+      btn.setAttribute('aria-busy', on ? 'true' : 'false');
+      label.textContent = on ? 'Signing in…' : 'Sign in';
+      spin.style.display = on ? 'inline-block' : 'none';
+    }
+
+    async function submit(){
+      if (btn.disabled) return;
+      const u = document.getElementById('u').value.trim();
+      const p = document.getElementById('p').value;
+      const err = document.getElementById('err');
+      err.style.display = 'none';
+      setLoading(true);
+      try{
+        const url = new URL(API_BASE, location.origin);
+        url.searchParams.set("mode","api");
+        url.searchParams.set("op","login");
+        const res = await fetch(url.toString(), { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ username:u, password:p, op:"login" }) });
+        const json = await res.json();
+        if(json && json.ok && json.session){
+          try { localStorage.setItem('session', json.session); } catch(e){}
+          const next = "index.html?session=" + encodeURIComponent(json.session);
+          window.location.replace(next);
+        } else {
+          setLoading(false);
+          err.textContent = (json && json.error) || "Login failed.";
+          err.style.display = 'block';
+        }
+      } catch(e){
+        setLoading(false);
+        err.textContent = "Network error.";
+        err.style.display = 'block';
+      }
+    }
+
+    document.getElementById('btn').addEventListener('click', submit);
+    document.addEventListener('keydown', e => { if(e.key === 'Enter') submit(); });
+  </script>
+</body>
+</html>
