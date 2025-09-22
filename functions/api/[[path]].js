@@ -1,89 +1,95 @@
 // functions/api/[[path]].js
-// Cloudflare Pages Functions: handles ALL /api/* routes
+// Cloudflare Pages Functions — file-based routing for /api/*
+// Proxies ALL verbs to your GAS Web App and adds helpful CORS.
 
-const GAS_BASE =
-  "https://script.google.com/macros/s/AKfycbwrM29XMx5aQrDGj3gi64TukZDi5_M3dVj7ZkJWQky4jN1XYmlZhQf1WcD07NqzB08dLw/exec";
+const GAS_BASE = "https://script.google.com/macros/s/AKfycbwrM29XMx5aQrDGj3gi64TukZDi5_M3dVj7ZkJWQky4jN1XYmlZhQf1WcD07NqzB08dLw/exec";
 
-// Which frontends are allowed to call
 const ALLOW_ORIGINS = new Set([
   "https://globalhillview1.github.io",
   "https://globalhillview1.github.io/GHVBot",
   "https://ghvbot.pages.dev",
-  "https://bot-81z.pages.dev", // your Pages domain
+  "https://bot-81z.pages.dev",   // your Pages domain
 ]);
 
-function cors(origin) {
+function corsHeaders(origin) {
   const allow = ALLOW_ORIGINS.has(origin) ? origin : "*";
   return {
     "Access-Control-Allow-Origin": allow,
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
     "Access-Control-Max-Age": "86400",
   };
 }
 
-export async function onRequest(context) {
-  const { request } = context;
-  const origin = request.headers.get("Origin") || "*";
-
-  // Preflight
-  if (request.method === "OPTIONS") {
-    return new Response(null, { headers: cors(origin) });
-  }
-
-  const incoming = new URL(request.url);
-  const op = incoming.searchParams.get("op");
-
-  // ---- Short-circuit common ops ----
-  if (op === "ping") {
-    return new Response(JSON.stringify({ ok: true, ts: Date.now() }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...cors(origin) },
-    });
-  }
-
-if (op === "sessionInfo") {
-  return new Response(
-    JSON.stringify({
-      ok: true,
-      info: { ok: false, role: "user" }   // <-- Add info field
-    }),
-    {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...cors(origin) },
-    }
-  );
+function buildUpstreamURL(reqUrl) {
+  const inUrl = new URL(reqUrl);
+  const outUrl = new URL(GAS_BASE);
+  // copy through query
+  inUrl.searchParams.forEach((v, k) => outUrl.searchParams.set(k, v));
+  return outUrl.toString();
 }
 
-  // ---- Proxy everything else to GAS ----
-  const isData = incoming.pathname.startsWith("/api/data");
-  const target = new URL(GAS_BASE);
-  target.search = incoming.search || (isData ? "?mode=data" : "?mode=api");
+async function forward(method, request) {
+  const up = buildUpstreamURL(request.url);
+  const headersIn = Object.fromEntries(request.headers);
 
-  const init = { method: request.method, headers: { "Content-Type": "application/json" } };
-
-  if (request.method === "POST") {
-    const bodyText = await request.text();
-    init.body = bodyText || "{}";
-
-    // Ensure ?mode/op are passed through
-    const qs = new URLSearchParams(target.search.slice(1));
-    if (!qs.get("mode")) qs.set("mode", "api");
-    try {
-      const obj = bodyText ? JSON.parse(bodyText) : {};
-      if (!qs.get("op") && obj && obj.op) qs.set("op", obj.op);
-    } catch {}
-    target.search = "?" + qs.toString();
+  // read body for non-GET/HEAD/OPTIONS
+  let body = null;
+  if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+    // accept either JSON or form; just pass through raw text
+    body = await request.text();
   }
 
-  const res = await fetch(target.toString(), init);
-  const text = await res.text();
-
-  return new Response(text, {
-    status: res.status,
+  const res = await fetch(up, {
+    method,
     headers: {
-      "Content-Type": res.headers.get("content-type") || "application/json",
-      ...cors(origin),
+      // pass through content-type when we have a body
+      ...(body ? { "Content-Type": headersIn["content-type"] || "application/json" } : {}),
+      // small cache protection (Apps Script is dynamic)
+      "Cache-Control": "no-cache",
     },
+    body: body || null,
+    // don’t cache dynamic requests at the edge
+    cf: { cacheTtl: 0, cacheEverything: false },
   });
+
+  return res;
 }
+
+export async function onRequestOptions({ request }) {
+  const h = corsHeaders(new URL(request.url).origin);
+  return new Response(null, { status: 204, headers: h });
+}
+
+export async function onRequestGet(ctx) {
+  try {
+    const upstream = await forward("GET", ctx.request);
+    const txt = await upstream.text();
+    const h = corsHeaders(new URL(ctx.request.url).origin);
+    h["Content-Type"] = upstream.headers.get("content-type") || "application/json";
+    return new Response(txt, { status: upstream.status, headers: h });
+  } catch (err) {
+    const h = corsHeaders(new URL(ctx.request.url).origin);
+    h["Content-Type"] = "application/json";
+    return new Response(JSON.stringify({ ok: false, message: err.message }), { status: 502, headers: h });
+  }
+}
+
+export async function onRequestPost(ctx) {
+  try {
+    const upstream = await forward("POST", ctx.request);
+    const txt = await upstream.text();
+    const h = corsHeaders(new URL(ctx.request.url).origin);
+    h["Content-Type"] = upstream.headers.get("content-type") || "application/json";
+    return new Response(txt, { status: upstream.status, headers: h });
+  } catch (err) {
+    const h = corsHeaders(new URL(ctx.request.url).origin);
+    h["Content-Type"] = "application/json";
+    return new Response(JSON.stringify({ ok: false, message: err.message }), { status: 502, headers: h });
+  }
+}
+
+// Optional: support PUT/PATCH/DELETE the same way
+export const onRequestPut = onRequestPost;
+export const onRequestPatch = onRequestPost;
+export const onRequestDelete = onRequestPost;
