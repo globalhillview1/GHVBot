@@ -6,10 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
   <style>
-    :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9;--header-h:72px;--controls-h:0px}
-    .dark{--bg:#0b1220;--card:#121a2a;--muted:#9aa4b2;--text:#e5e7eb;--border:#1f2937;--hover:#0f172a}
+    :root{
+      --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280; --text:#0f172a;
+      --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed; --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
+      --border:#e5e7eb; --hover:#f1f5f9;
+      --header-h: 72px; --controls-h: 0px;
+    }
+    .dark{
+      --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb;
+      --border:#1f2937; --hover:#0f172a;
+    }
     *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";margin:0;color:var(--text);background:var(--bg)}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans"; margin:0; color:var(--text); background:var(--bg)}
     header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
     .brand{display:flex;align-items:center;gap:10px}
     .brand img{height:32px;width:auto;border-radius:6px}
@@ -27,18 +35,29 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
     .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
     .card .value{font-size:20px;font-weight:800;margin-top:6px}
-    .card.total{border-left:6px solid var(--green)}.card.open{border-left:6px solid var(--gray)}.card.progress{border-left:6px solid var(--amber)}.card.resolved{border-left:6px solid var(--blue)}.card.avgtime{border-left:6px solid var(--cyan)}.card.avgrating{border-left:6px solid var(--violet)}
+    .card.total{border-left:6px solid var(--green)}
+    .card.open{border-left:6px solid var(--gray)}
+    .card.progress{border-left:6px solid var(--amber)}
+    .card.resolved{border-left:6px solid var(--blue)}
+    .card.avgtime{border-left:6px solid var(--cyan)}
+    .card.avgrating{border-left:6px solid var(--violet)}
     .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
     table{width:100%;border-collapse:separate;border-spacing:0}
     thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
     tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
     tr:hover td{background:var(--hover)}
-    .sortable{cursor:pointer}.sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
+    .sortable{cursor:pointer}
+    .sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
-    .Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
-    .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}.media video,.media audio{width:140px;height:auto}
-    .pagination{display:flex;align-items:center;gap:8px;padding:10px}.spacer{flex:1}.muted{color:var(--muted);font-size:12px}
+    .Open{background:#111827;color:#fff}
+    .InProgress{background:#f59e0b;color:#111}
+    .Resolved{background:#0d6efd;color:#fff}
+    .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
+    .media video,.media audio{width:140px;height:auto}
+    .pagination{display:flex;align-items:center;gap:8px;padding:10px}
+    .spacer{flex:1}
+    .muted{color:var(--muted);font-size:12px}
     #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
     #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
     .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
@@ -46,8 +65,9 @@
     .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
     .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15)}
-    @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
+    @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
@@ -119,73 +139,35 @@
   <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
 
   <script>
-    // ====== IMPORTANT: run on Cloudflare Pages (no google.script.run) ======
-    const API_BASE = "/api"; // our Pages Functions proxy
+    /* ===================== Auth helpers ===================== */
+    function getSessionToken(){
+      try { return localStorage.getItem('session') || null; } catch(e){ return null; }
+    }
+    function setSessionToken(tok){
+      try {
+        if (tok) localStorage.setItem('session', tok);
+        else localStorage.removeItem('session');
+      } catch(e){}
+    }
+
+    /* ===================== State & helpers (unchanged UI logic) ===================== */
     const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
 
-    // Helpers
-    const parseDateSafe = s => { if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; };
-    const fmtDate = (d,tzMode) => { if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; };
-    const endOfDay = d => { const x=new Date(d); x.setHours(23,59,59,999); return x; };
-    const msToHuman = ms => { if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; };
-    const renderMediaCell = url => !url? "<span class='muted'>No media</span>" :
-      (/\.(jpe?g|png|gif|webp)$/i.test(url)? `<div class="media"><img src="${url.replace(/"/g,"&quot;")}" alt="media" onclick="openLightbox('${url.replace(/"/g,"&quot;")}')" /></div>` :
-      (/\.(mp4|webm|mov)$/i.test(url)? `<div class="media"><video controls><source src="${url.replace(/"/g,"&quot;")}"></video></div>` :
-      (/\.(mp3|wav|m4a)$/i.test(url)? `<div class="media"><audio controls src="${url.replace(/"/g,"&quot;")}"></audio></div>` :
-      `<a href="${url.replace(/"/g,"&quot;")}" target="_blank" rel="noopener">Open</a>`)));
-    const openLightbox = url => { document.getElementById("lightbox-img").src=url; document.getElementById("lightbox").style.display="flex"; };
-    const debounce = (fn,ms)=>{ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } };
-
-    function getSessionToken(){ try { return localStorage.getItem('session') || null; } catch(e){ return null; } }
-    function setSessionToken(tok){ try { if(tok) localStorage.setItem('session', tok); else localStorage.removeItem('session'); } catch(e){} }
-
-    // ====== Cloudflare endpoints ======
-    async function getSessionInfo(){
-      // our worker returns { ok:true, info:{ ok:false, role:'user' } }
-      try {
-        const r = await fetch(`${API_BASE}?mode=api&op=sessionInfo`, { cache:"no-store" });
-        return await r.json();
-      } catch(e){ return { ok:false }; }
-    }
-    async function fetchRows(){
-      const r = await fetch(`${API_BASE}/data?mode=data`, { cache:"no-store" });
-      if(!r.ok) throw new Error(r.statusText);
-      return await r.json();
-    }
-    function logoutNow(){ setSessionToken(null); location.href = "/"; }
-
-    // ====== UI init ======
+    function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
+    function fmtDate(d,tzMode){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; }
+    function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
+    function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
+    function renderMediaCell(url){ if(!url) return "<span class='muted'>No media</span>"; const esc=s=>String(s).replace(/"/g,"&quot;"); if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" alt="media" onclick="openLightbox('${esc(url)}')" /></div>`; if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls><source src="${esc(url)}"></video></div>`; if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`; return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`; }
+    function openLightbox(url){ document.getElementById("lightbox-img").src=url; document.getElementById("lightbox").style.display="flex"; }
     function setStickyHeights(){ const h=document.querySelector('header'); const c=document.getElementById('controls'); if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px'); if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px'); }
     window.addEventListener('resize', setStickyHeights);
 
-    async function init(){
-      // basic bindings
-      document.getElementById("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
-      document.getElementById("exportCsv").addEventListener("click", exportCSV);
-      document.getElementById("applyBtn").addEventListener("click", applyFilters);
-      document.getElementById("resetBtn").addEventListener("click", resetFilters);
-      document.getElementById("prevPage").addEventListener("click", ()=>{ if(state.page>1){ state.page--; render(); }});
-      document.getElementById("nextPage").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(state.filtered.length/state.pageSize)); if(state.page<max){ state.page++; render(); }});
-      document.getElementById("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
-      document.getElementById("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
-      document.getElementById("search").addEventListener("input", debounce(applyFilters, 250));
-      document.getElementById("autoRefresh").addEventListener("change", ()=>{});
-      document.getElementById("logoutBtn").addEventListener("click", logoutNow);
-
-      // discover "role" via worker (always user for now)
-      try {
-        const info = await getSessionInfo();
-        state.isAdmin = !!(info && info.info && info.info.ok && String(info.info.role).toLowerCase()==='admin');
-      } catch(e){ state.isAdmin = false; }
-
-      await loadAndRender();
-      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) loadAndRender(); }, 60000);
-      setStickyHeights();
-    }
-
-    async function loadAndRender(){
+    /* ===================== Data loading via Pages Function ===================== */
+    async function fetchData(){
       try{
-        const data = await fetchRows();
+        const r = await fetch("/api?mode=data", { cache:"no-store" });
+        if(!r.ok) throw new Error(r.statusText);
+        const data = await r.json();
         state.lastFetchOk = true;
         document.getElementById("netError").style.display = "none";
         document.getElementById("infoMsg").style.display = "none";
@@ -199,8 +181,6 @@
         if(state.all.length){ document.getElementById("infoMsg").style.display = "block"; render(); }
       }
     }
-
-    // Data transforms
     function normalizeRows(rows){
       return rows.map(r=>{
         const raised = parseDateSafe(r["Date and Time Raised"]);
@@ -221,19 +201,18 @@
         if(!existing.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
       });
     }
-
     function applyFilters(){
       const tower = document.getElementById("towerFilter").value;
       const status = document.getElementById("statusFilter").value;
       const from = document.getElementById("fromDate").value ? new Date(document.getElementById("fromDate").value) : null;
-      const to   = document.getElementById("toDate").value ? endOfDay(document.getElementById("toDate").value) : null;
+      const to = document.getElementById("toDate").value ? endOfDay(document.getElementById("toDate").value) : null;
       const q = document.getElementById("search").value.trim().toLowerCase();
 
       state.filtered = state.all.filter(r=>{
         if(tower && r.Tower !== tower) return false;
         if(status && r.Status !== status) return false;
         if(from && r.__raised && r.__raised < from) return false;
-        if(to   && r.__raised && r.__raised > to) return false;
+        if(to && r.__raised && r.__raised > to) return false;
         if(q){
           const blob = [r["Tracking ID"], r["Tower"], r["Flat"], r["Issue"], r["Description"], r["Redressal Remark"], r["Status"], r["User ID"], r["Feedback Rating"]]
             .map(x=>String(x||"").toLowerCase()).join(" ");
@@ -244,7 +223,6 @@
       state.page = 1;
       render();
     }
-
     function resetFilters(){
       document.getElementById("towerFilter").value = "";
       document.getElementById("statusFilter").value = "";
@@ -256,7 +234,6 @@
       render();
     }
 
-    // Render
     function render(){
       const {key, dir} = state.sort;
       const data = state.filtered.slice().sort((a,b)=>{
@@ -278,8 +255,12 @@
       const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
       const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
 
-      kpiTotal.textContent = total; kpiOpen.textContent = open; kpiProgress.textContent = progress; kpiResolved.textContent = resolved;
-      kpiAvgTime.textContent = msToHuman(avgMs); kpiAvgRating.textContent = avgRating;
+      document.getElementById("kpiTotal").textContent = total;
+      document.getElementById("kpiOpen").textContent = open;
+      document.getElementById("kpiProgress").textContent = progress;
+      document.getElementById("kpiResolved").textContent = resolved;
+      document.getElementById("kpiAvgTime").textContent = msToHuman(avgMs);
+      document.getElementById("kpiAvgRating").textContent = avgRating;
 
       const tbody = document.querySelector("#grid tbody");
       tbody.innerHTML = "";
@@ -297,7 +278,7 @@
           <td>${r["Issue"]||""}</td>
           <td>${r["Description"]||""}</td>
           <td>${renderMediaCell(r["Media URL"])}</td>
-          <td>${`<span class="badge ${r["Status"]||""}">${r["Status"]||""}</span>`}</td>
+          <td><span class="badge ${r["Status"]||""}">${r["Status"]||""}</span></td>
           <td>${r["Redressal Remark"]||""}</td>
           <td>${r["User ID"]||""}</td>
           <td>${resolvedStr}</td>
@@ -312,11 +293,10 @@
       });
 
       const maxPage = Math.max(1, Math.ceil(data.length / state.pageSize));
-      pageInfo.textContent = `Page ${state.page} / ${maxPage}`;
-      rowCount.textContent = `${data.length} row(s), showing ${slice.length}`;
+      document.getElementById("pageInfo").textContent = `Page ${state.page} / ${maxPage}`;
+      document.getElementById("rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
     }
 
-    // CSV
     function exportCSV(){
       const rows = state.filtered.length ? state.filtered : state.all;
       const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
@@ -335,6 +315,44 @@
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "helpdesk.csv"; a.click();
     }
 
+    function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
+
+    /* ===================== Auth gate + init ===================== */
+    function logoutNow(){
+      setSessionToken(null);
+      location.href = "/login";
+    }
+
+    async function loadAndRender(){
+      await fetchData();
+    }
+
+    async function init(){
+      // 🔒 Require session before anything else
+      if (!getSessionToken()) {
+        location.href = "/login";
+        return;
+      }
+
+      document.getElementById("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
+      document.getElementById("exportCsv").addEventListener("click", exportCSV);
+      document.getElementById("applyBtn").addEventListener("click", applyFilters);
+      document.getElementById("resetBtn").addEventListener("click", resetFilters);
+      document.getElementById("prevPage").addEventListener("click", ()=>{ if(state.page>1){ state.page--; render(); }});
+      document.getElementById("nextPage").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(state.filtered.length/state.pageSize)); if(state.page<max){ state.page++; render(); }});
+      document.getElementById("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
+      document.getElementById("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
+      document.getElementById("search").addEventListener("input", debounce(applyFilters, 250));
+      document.getElementById("autoRefresh").addEventListener("change", ()=>{});
+      document.getElementById("logoutBtn").addEventListener("click", logoutNow);
+
+      await loadAndRender();
+      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) loadAndRender(); }, 60000);
+      setStickyHeights();
+    }
+
+    window.onload = init;
+
     // Sorting handlers
     document.addEventListener('DOMContentLoaded', ()=>{
       document.querySelectorAll("th.sortable").forEach(th=>{
@@ -346,8 +364,6 @@
         });
       });
     });
-
-    window.onload = init;
   </script>
 </body>
 </html>
