@@ -8,13 +8,19 @@
   <style>
     :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9;--header-h:72px;--controls-h:0px}
     .dark{--bg:#0b1220;--card:#121a2a;--muted:#9aa4b2;--text:#e5e7eb;--border:#1f2937;--hover:#0f172a}
-    *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";margin:0;color:var(--text);background:var(--bg)}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";margin:0;color:var(--text);background:var(--bg)}
     header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
-    .brand{display:flex;align-items:center;gap:10px}.brand img{height:32px;width:auto;border-radius:6px}header h1{font-size:20px;margin:0;font-weight:700}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:32px;width:auto;border-radius:6px}
+    header h1{font-size:20px;margin:0;font-weight:700}
     .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
     .switch{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
     .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
-    .btn:hover{background:var(--hover)}.btn.primary{background:var(--blue);color:#fff;border-color:transparent}.btn.danger{background:var(--danger);color:#fff;border-color:transparent}.btn.small{padding:4px 8px;font-size:12px}
+    .btn:hover{background:var(--hover)}
+    .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
+    .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+    .btn.small{padding:4px 8px;font-size:12px}
     .cell-actions{display:flex;gap:6px;align-items:center}
     .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
     .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
@@ -26,16 +32,21 @@
     .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
     table{width:100%;border-collapse:separate;border-spacing:0}
     thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
-    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}tr:hover td{background:var(--hover)}
+    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
+    tr:hover td{background:var(--hover)}
     .sortable{cursor:pointer}.sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}.Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
+    .Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
     .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}.media video,.media audio{width:140px;height:auto}
     .pagination{display:flex;align-items:center;gap:8px;padding:10px}.spacer{flex:1}.muted{color:var(--muted);font-size:12px}
-    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}#lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
-    .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}.banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}.banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
+    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
+    #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
+    .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
+    .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+    .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
     .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
+    .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15)}
     @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
@@ -52,9 +63,7 @@
       <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
       <button id="toggleDark" class="btn">Dark mode</button>
       <button class="btn" id="exportCsv">Export CSV</button>
-      <button class="btn danger" id="logoutBtn" style="display:inline-flex;align-items:center;gap:8px">
-        <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
-      </button>
+      <button class="btn danger" id="logoutBtn">Logout</button>
     </div>
   </header>
 
@@ -110,59 +119,47 @@
   <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
 
   <script>
-    // ========= API base (GitHub Pages -> call CF Pages; CF Pages -> relative) =========
-    const API_BASE = "/api";
+    // ====== IMPORTANT: run on Cloudflare Pages (no google.script.run) ======
+    const API_BASE = "/api"; // our Pages Functions proxy
+    const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
 
-    const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false, session: null };
+    // Helpers
+    const parseDateSafe = s => { if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; };
+    const fmtDate = (d,tzMode) => { if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; };
+    const endOfDay = d => { const x=new Date(d); x.setHours(23,59,59,999); return x; };
+    const msToHuman = ms => { if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; };
+    const renderMediaCell = url => !url? "<span class='muted'>No media</span>" :
+      (/\.(jpe?g|png|gif|webp)$/i.test(url)? `<div class="media"><img src="${url.replace(/"/g,"&quot;")}" alt="media" onclick="openLightbox('${url.replace(/"/g,"&quot;")}')" /></div>` :
+      (/\.(mp4|webm|mov)$/i.test(url)? `<div class="media"><video controls><source src="${url.replace(/"/g,"&quot;")}"></video></div>` :
+      (/\.(mp3|wav|m4a)$/i.test(url)? `<div class="media"><audio controls src="${url.replace(/"/g,"&quot;")}"></audio></div>` :
+      `<a href="${url.replace(/"/g,"&quot;")}" target="_blank" rel="noopener">Open</a>`)));
+    const openLightbox = url => { document.getElementById("lightbox-img").src=url; document.getElementById("lightbox").style.display="flex"; };
+    const debounce = (fn,ms)=>{ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } };
 
-    function getSessionToken(){
-      const urlToken = new URLSearchParams(location.search).get('session');
-      if (urlToken) { try { localStorage.setItem('session', urlToken); } catch(e){} return urlToken; }
-      try { const stored = localStorage.getItem('session'); if (stored) return stored; } catch(e){}
-      return null;
+    function getSessionToken(){ try { return localStorage.getItem('session') || null; } catch(e){ return null; } }
+    function setSessionToken(tok){ try { if(tok) localStorage.setItem('session', tok); else localStorage.removeItem('session'); } catch(e){} }
+
+    // ====== Cloudflare endpoints ======
+    async function getSessionInfo(){
+      // our worker returns { ok:true, info:{ ok:false, role:'user' } }
+      try {
+        const r = await fetch(`${API_BASE}?mode=api&op=sessionInfo`, { cache:"no-store" });
+        return await r.json();
+      } catch(e){ return { ok:false }; }
     }
-
-    function apiGet(path, params={}){
-      const u = new URL(API_BASE + path, location.origin);
-      Object.entries(params).forEach(([k,v])=>{ if(v!=null) u.searchParams.set(k,v); });
-      return fetch(u.toString(), { method:"GET", headers:{ "Accept":"application/json" }, credentials:"omit" }).then(r=>r.json());
+    async function fetchRows(){
+      const r = await fetch(`${API_BASE}/data?mode=data`, { cache:"no-store" });
+      if(!r.ok) throw new Error(r.statusText);
+      return await r.json();
     }
-    function apiPost(op, body){
-      const u = new URL(API_BASE, location.origin);
-      u.pathname = API_BASE.endsWith("/api") ? API_BASE : (API_BASE.replace(/\/$/,"") + "/api");
-      u.searchParams.set("mode", "api");
-      u.searchParams.set("op", op);
-      return fetch(u.toString(), { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ op, ...body }) }).then(r=>r.json());
-    }
+    function logoutNow(){ setSessionToken(null); location.href = "/"; }
 
-    function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
-    function fmtDate(d,tzMode){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; }
-    function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
-    function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
-    function renderMediaCell(url){ if(!url) return "<span class='muted'>No media</span>"; const esc=s=>String(s).replace(/"/g,"&quot;"); if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" alt="media" onclick="openLightbox('${esc(url)}')" /></div>`; if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls><source src="${esc(url)}"></video></div>`; if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`; return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`; }
-    function openLightbox(url){ document.getElementById("lightbox-img").src=url; document.getElementById("lightbox").style.display="flex"; }
-
+    // ====== UI init ======
     function setStickyHeights(){ const h=document.querySelector('header'); const c=document.getElementById('controls'); if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px'); if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px'); }
     window.addEventListener('resize', setStickyHeights);
 
-    function setLogoutLoading(on){ const b=document.getElementById('logoutBtn'), s=document.getElementById('logoutSpin'), l=document.getElementById('logoutLabel'); b.disabled=!!on; if(s) s.style.display=on?'inline-block':'none'; if(l) l.textContent=on?'Logging out…':'Logout'; }
-
-    function handleLogout(){
-      const token = state.session;
-      if(!token) { try{localStorage.removeItem('session');}catch(e){} location.href = "login.html"; return; }
-      setLogoutLoading(true);
-      apiPost("logout", { session: token }).then(()=>{
-        try{localStorage.removeItem('session');}catch(e){}
-        location.href = "login.html";
-      }).catch(()=>{
-        setLogoutLoading(false);
-        alert('Failed to logout');
-      });
-    }
-
-    function init(){
-      state.session = getSessionToken();
-
+    async function init(){
+      // basic bindings
       document.getElementById("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
       document.getElementById("exportCsv").addEventListener("click", exportCSV);
       document.getElementById("applyBtn").addEventListener("click", applyFilters);
@@ -173,26 +170,22 @@
       document.getElementById("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
       document.getElementById("search").addEventListener("input", debounce(applyFilters, 250));
       document.getElementById("autoRefresh").addEventListener("change", ()=>{});
-      document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+      document.getElementById("logoutBtn").addEventListener("click", logoutNow);
 
-      // Get role, then data
-      const token = state.session;
-      apiGet("/api", { mode:"api", op:"sessionInfo", session: token || "" })
-        .then(res=>{
-          state.isAdmin = !!(res && res.info && res.info.ok && String(res.info.role).toLowerCase()==='admin');
-          fetchData();
-          state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) fetchData(); }, 60000);
-        })
-        .catch(()=>{ fetchData(); });
+      // discover "role" via worker (always user for now)
+      try {
+        const info = await getSessionInfo();
+        state.isAdmin = !!(info && info.info && info.info.ok && String(info.info.role).toLowerCase()==='admin');
+      } catch(e){ state.isAdmin = false; }
 
+      await loadAndRender();
+      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) loadAndRender(); }, 60000);
       setStickyHeights();
     }
 
-    async function fetchData(){
+    async function loadAndRender(){
       try{
-        const r = await apiGet("/api/data", { mode:"data" });
-        if(!(r && r.ok)) throw new Error("bad");
-        const data = r.data || [];
+        const data = await fetchRows();
         state.lastFetchOk = true;
         document.getElementById("netError").style.display = "none";
         document.getElementById("infoMsg").style.display = "none";
@@ -207,6 +200,7 @@
       }
     }
 
+    // Data transforms
     function normalizeRows(rows){
       return rows.map(r=>{
         const raised = parseDateSafe(r["Date and Time Raised"]);
@@ -220,7 +214,6 @@
         return { ...r, __raised: raised, __resolved: resolved, __computed_time: ms };
       });
     }
-
     function populateTowerFilter(data){
       const sel = document.getElementById("towerFilter");
       const existing = new Set([...sel.options].map(o=>o.value));
@@ -233,14 +226,14 @@
       const tower = document.getElementById("towerFilter").value;
       const status = document.getElementById("statusFilter").value;
       const from = document.getElementById("fromDate").value ? new Date(document.getElementById("fromDate").value) : null;
-      const to = document.getElementById("toDate").value ? endOfDay(document.getElementById("toDate").value) : null;
+      const to   = document.getElementById("toDate").value ? endOfDay(document.getElementById("toDate").value) : null;
       const q = document.getElementById("search").value.trim().toLowerCase();
 
       state.filtered = state.all.filter(r=>{
         if(tower && r.Tower !== tower) return false;
         if(status && r.Status !== status) return false;
         if(from && r.__raised && r.__raised < from) return false;
-        if(to && r.__raised && r.__raised > to) return false;
+        if(to   && r.__raised && r.__raised > to) return false;
         if(q){
           const blob = [r["Tracking ID"], r["Tower"], r["Flat"], r["Issue"], r["Description"], r["Redressal Remark"], r["Status"], r["User ID"], r["Feedback Rating"]]
             .map(x=>String(x||"").toLowerCase()).join(" ");
@@ -263,6 +256,7 @@
       render();
     }
 
+    // Render
     function render(){
       const {key, dir} = state.sort;
       const data = state.filtered.slice().sort((a,b)=>{
@@ -284,12 +278,8 @@
       const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
       const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
 
-      document.getElementById("kpiTotal").textContent = total;
-      document.getElementById("kpiOpen").textContent = open;
-      document.getElementById("kpiProgress").textContent = progress;
-      document.getElementById("kpiResolved").textContent = resolved;
-      document.getElementById("kpiAvgTime").textContent = msToHuman(avgMs);
-      document.getElementById("kpiAvgRating").textContent = avgRating;
+      kpiTotal.textContent = total; kpiOpen.textContent = open; kpiProgress.textContent = progress; kpiResolved.textContent = resolved;
+      kpiAvgTime.textContent = msToHuman(avgMs); kpiAvgRating.textContent = avgRating;
 
       const tbody = document.querySelector("#grid tbody");
       tbody.innerHTML = "";
@@ -307,33 +297,8 @@
           <td>${r["Issue"]||""}</td>
           <td>${r["Description"]||""}</td>
           <td>${renderMediaCell(r["Media URL"])}</td>
-
-          <td>
-            ${
-              state.isAdmin
-                ? `<select class="edit-status" data-id="${r["Tracking ID"]}">
-                     <option value="Open"${r["Status"]==="Open"?" selected":""}>Open</option>
-                     <option value="InProgress"${r["Status"]==="InProgress"?" selected":""}>In Progress</option>
-                     <option value="Resolved"${r["Status"]==="Resolved"?" selected":""}>Resolved</option>
-                   </select>`
-                : `<span class="badge ${r["Status"]||""}">${r["Status"]||""}</span>`
-            }
-          </td>
-
-          <td>
-            ${
-              state.isAdmin
-                ? `<div class="cell-actions">
-                     <div class="edit-remark" contenteditable="true" data-id="${r["Tracking ID"]}"
-                          style="min-width:180px;max-width:360px;max-height:76px;overflow:auto;outline:1px solid var(--border);border-radius:8px;padding:6px 8px;background:var(--card)">
-                       ${r["Redressal Remark"] ? String(r["Redressal Remark"]).replace(/</g,"&lt;").replace(/>/g,"&gt;") : ""}
-                     </div>
-                     <button class="btn small save-remark" data-id="${r["Tracking ID"]}">Save</button>
-                   </div>`
-                : `${r["Redressal Remark"]||""}`
-            }
-          </td>
-
+          <td>${`<span class="badge ${r["Status"]||""}">${r["Status"]||""}</span>`}</td>
+          <td>${r["Redressal Remark"]||""}</td>
           <td>${r["User ID"]||""}</td>
           <td>${resolvedStr}</td>
           <td>${timeStr}</td>
@@ -347,58 +312,11 @@
       });
 
       const maxPage = Math.max(1, Math.ceil(data.length / state.pageSize));
-      document.getElementById("pageInfo").textContent = `Page ${state.page} / ${maxPage}`;
-      document.getElementById("rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
-
-      if (state.isAdmin) {
-        document.querySelectorAll('.edit-status').forEach(sel=>{
-          sel.addEventListener('change', ()=>{
-            const id = sel.getAttribute('data-id');
-            const val = sel.value;
-            sel.disabled = true;
-            apiPost("updateticket", { session: state.session, trackingId: id, field: "Status", value: val })
-              .then(res=>{
-                sel.disabled = false;
-                if(!(res && res.ok)){ alert((res && res.error) || 'Update failed'); return; }
-                fetchData();
-              })
-              .catch(err=>{ sel.disabled=false; alert('Network error'); });
-          });
-        });
-
-        document.querySelectorAll('.save-remark').forEach(btn=>{
-          btn.addEventListener('click', ()=>{
-            const id = btn.getAttribute('data-id');
-            const box = document.querySelector(`.edit-remark[data-id="${id}"]`);
-            if(!box) return;
-
-            const val = box.textContent.trim();
-            const old = btn.textContent;
-            btn.disabled = true; btn.textContent = 'Saving…';
-
-            apiPost("updateticket", { session: state.session, trackingId: id, field: "Redressal Remark", value: val })
-              .then(res=>{
-                btn.disabled=false; btn.textContent='Save';
-                if(!(res && res.ok)){ alert((res && res.error) || 'Update failed'); return; }
-                fetchData();
-              })
-              .catch(()=>{ btn.disabled=false; btn.textContent='Save'; alert('Network error'); });
-          });
-        });
-
-        document.querySelectorAll('.edit-remark').forEach(div=>{
-          div.addEventListener('keydown', e=>{
-            if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-              const id = div.getAttribute('data-id');
-              const btn = document.querySelector(`.save-remark[data-id="${id}"]`);
-              if(btn) btn.click();
-              e.preventDefault();
-            }
-          });
-        });
-      }
+      pageInfo.textContent = `Page ${state.page} / ${maxPage}`;
+      rowCount.textContent = `${data.length} row(s), showing ${slice.length}`;
     }
 
+    // CSV
     function exportCSV(){
       const rows = state.filtered.length ? state.filtered : state.all;
       const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
@@ -417,8 +335,7 @@
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "helpdesk.csv"; a.click();
     }
 
-    function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
-
+    // Sorting handlers
     document.addEventListener('DOMContentLoaded', ()=>{
       document.querySelectorAll("th.sortable").forEach(th=>{
         th.addEventListener("click", ()=>{
