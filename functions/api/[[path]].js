@@ -42,14 +42,18 @@ export async function onRequest(context) {
     });
   }
 
-  if (op === "sessionInfo") {
-    // You can make this smarter later (e.g. verify tokens),
-    // but for now always say "not logged in"
-    return new Response(JSON.stringify({ ok: false }), {
+if (op === "sessionInfo") {
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      info: { ok: false, role: "user" }   // <-- Add info field
+    }),
+    {
       status: 200,
       headers: { "Content-Type": "application/json", ...cors(origin) },
-    });
-  }
+    }
+  );
+}
 
   // ---- Proxy everything else to GAS ----
   const isData = incoming.pathname.startsWith("/api/data");
