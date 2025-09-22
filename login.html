@@ -41,11 +41,7 @@
 
   <script>
     // If already logged in, skip login page
-    (function(){
-      try{
-        if (localStorage.getItem('session')) location.href = '/';
-      }catch(e){}
-    })();
+    try{ if (localStorage.getItem('session')) location.href = '/'; }catch(e){}
 
     function showErr(msg){ const el = document.getElementById('err'); el.textContent = msg; el.style.display = 'block'; }
 
@@ -54,10 +50,10 @@
       const p = document.getElementById('p').value;
       if(!u || !p){ showErr('Missing username or password.'); return; }
 
-      // Client-side token for Cloudflare Pages demo.
-      // (If you later wire real Apps Script login, set the returned token here instead.)
+      // Demo-only local session + role
       try {
         localStorage.setItem('session', 'token-' + Math.random().toString(36).slice(2));
+        localStorage.setItem('role', u.toLowerCase()==='admin' ? 'admin' : 'user');
       } catch(e) {}
 
       location.href = '/';
