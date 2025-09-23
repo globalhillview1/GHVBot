@@ -134,6 +134,15 @@
   <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
 
   <script>
+    const API = "/api"; // Pages Functions base
+function toast(msg, kind="info"){
+  const b = document.getElementById("infoMsg");
+  b.className = "banner " + (kind==="error" ? "error" : "info");
+  b.textContent = msg;
+  b.style.display = "block";
+  setTimeout(()=> b.style.display="none", 2200);
+}
+
     /* ===== Auth helpers ===== */
     const getTok = () => { try { return localStorage.getItem('session'); } catch(e){ return null; } };
     const getRole = () => { try { return localStorage.getItem('role') || 'user'; } catch(e){ return 'user'; } };
