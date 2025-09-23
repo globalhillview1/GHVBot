@@ -1,158 +1,152 @@
 // functions/api/[[path]].js
+// Cloudflare Pages Functions – unified /api endpoint that proxies to GAS
+// Stream-safe (we never read the body unless we need to), CORS, simple session.
 
-const GAS_BASE =
-  "https://script.google.com/macros/s/AKfycbzgtXFMYHb2Vg29UiFMlHx2Wm-KzWFXb35o56Bx3rrjfSJ8inP04I8HuVVO5cceBWftsA/exec";
+const GAS_BASE = "https://script.google.com/macros/s/AKfycbwrM29XMx5aQrDGj3gi64TukZDi5_M3dVj7ZkJWQky4jN1XYmlZhQf1WcD07NqzB08dLw/exec";
 
-const COOKIE_NAME = "__Host-ghv_sess";
-const COOKIE_MAX_AGE = 60 * 60 * 8; // 8h
-
-const ALLOW = new Set([
+const ALLOW_ORIGINS = new Set([
   "https://bot-81z.pages.dev",
   "https://globalhillview1.github.io",
-  "https://globalhillview1.github.io/GHVBot",
+  "https://globalhillview1.github.io/GHVBot"
 ]);
 
-const json = (obj, init = {}) =>
-  new Response(JSON.stringify(obj), {
-    status: init.status || 200,
-    headers: { "content-type": "application/json", ...(init.headers || {}) },
+const SESSION_COOKIE = "ghv_session"; // value: "admin" | "user"
+const oneDay = 24 * 60 * 60;
+
+function corsHeaders(origin) {
+  const hdrs = new Headers();
+  if (origin && ALLOW_ORIGINS.has(origin)) {
+    hdrs.set("Access-Control-Allow-Origin", origin);
+    hdrs.set("Vary", "Origin");
+    hdrs.set("Access-Control-Allow-Credentials", "true");
+    hdrs.set("Access-Control-Allow-Headers", "content-type");
+    hdrs.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  } else {
+    // default to no wildcard credentials to keep things strict
+    hdrs.set("Access-Control-Allow-Origin", "null");
+  }
+  return hdrs;
+}
+
+function json(data, init = {}, origin) {
+  const h = corsHeaders(origin);
+  h.set("Content-Type", "application/json");
+  return new Response(JSON.stringify(data), { ...init, headers: h });
+}
+
+function parseCookies(req) {
+  const out = {};
+  const raw = req.headers.get("cookie") || "";
+  raw.split(";").forEach(kv => {
+    const idx = kv.indexOf("=");
+    if (idx > -1) out[kv.slice(0, idx).trim()] = decodeURIComponent(kv.slice(idx + 1));
   });
-
-const allowOrigin = (req) => {
-  const o = req.headers.get("Origin");
-  if (ALLOW.has(o)) return o;
-  return "https://bot-81z.pages.dev";
-};
-
-const getQS = (url) => Object.fromEntries(new URL(url).searchParams.entries());
-const getCookie = (req, name) =>
-  (req.headers.get("Cookie") || "")
-    .split(";")
-    .map((s) => s.trim())
-    .find((c) => c.startsWith(name + "="))
-    ?.split("=")[1];
-
-const hasSession = (req) => Boolean(getCookie(req, COOKIE_NAME));
-const cookieHeader = (value, maxAge) =>
-  `${COOKIE_NAME}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
-
-async function handleApi(op, req) {
-  const origin = allowOrigin(req);
-
-  if (op === "ping") return json({ ok: true, ts: Date.now() });
-
-  if (op === "sessionInfo") {
-    const ok = hasSession(req);
-    return json(
-      { ok: true, info: { ok, role: ok ? "admin" : "user" } },
-      { headers: { "Access-Control-Allow-Origin": origin, Vary: "Origin" } }
-    );
-  }
-
-  if (op === "login") {
-    let body;
-    try {
-      body = await req.json();
-    } catch {
-      return json(
-        { ok: false, error: "bad_json" },
-        { status: 400, headers: { "Access-Control-Allow-Origin": origin, Vary: "Origin" } }
-      );
-    }
-    const { username, password } = body || {};
-    if (username === "admin" && password) {
-      return json(
-        { ok: true, role: "admin" },
-        {
-          headers: {
-            "Set-Cookie": cookieHeader("1", COOKIE_MAX_AGE),
-            "Access-Control-Allow-Origin": origin,
-            Vary: "Origin",
-          },
-        }
-      );
-    }
-    return json(
-      { ok: false, error: "invalid_credentials" },
-      { status: 401, headers: { "Access-Control-Allow-Origin": origin, Vary: "Origin" } }
-    );
-  }
-
-  if (op === "logout") {
-    return json(
-      { ok: true },
-      {
-        headers: {
-          "Set-Cookie": cookieHeader("", 0),
-          "Access-Control-Allow-Origin": origin,
-          Vary: "Origin",
-        },
-      }
-    );
-  }
-
-  return json({ ok: false, error: "bad_op" }, { status: 400 });
+  return out;
 }
 
-async function proxyToGAS(mode, req) {
-  const origin = allowOrigin(req);
-  const u = new URL(req.url);
-  const target = `${GAS_BASE}?${u.searchParams.toString()}`;
-
-  const res = await fetch(target, { method: "GET", redirect: "follow" });
-
-  // For updates: treat any 200 as success (GAS might return HTML/text).
-  if (mode === "update") {
-    if (res.ok) {
-      return json(
-        { ok: true },
-        { headers: { "Access-Control-Allow-Origin": origin, Vary: "Origin" } }
-      );
-    }
-    return json(
-      { ok: false, status: res.status },
-      { status: res.status, headers: { "Access-Control-Allow-Origin": origin, Vary: "Origin" } }
-    );
-  }
-
-  // For data: pass JSON through; if not JSON, return text (frontend shows a friendly error)
-  const ct = res.headers.get("content-type") || "";
-  const body = await res.text();
-  const headers = {
-    "Access-Control-Allow-Origin": origin,
-    Vary: "Origin",
-  };
-  if (ct.includes("application/json")) {
-    return new Response(body, { status: res.status, headers: { ...headers, "content-type": "application/json" } });
-  }
-  return new Response(body, { status: res.status, headers: { ...headers, "content-type": ct || "text/plain" } });
+function setCookie(name, value, maxAgeSeconds) {
+  const attrs = [
+    `${name}=${encodeURIComponent(value)}`,
+    `Path=/`,
+    `SameSite=Lax`,
+    `HttpOnly`,
+    `Secure`,
+    `Max-Age=${maxAgeSeconds}`
+  ];
+  return attrs.join("; ");
 }
 
-export async function onRequest({ request }) {
+export async function onRequest(context) {
+  const { request } = context;
+  const url = new URL(request.url);
+  const origin = request.headers.get("origin") || "";
+  const mode = url.searchParams.get("mode") || "";
+
   // CORS preflight
   if (request.method === "OPTIONS") {
-    const origin = allowOrigin(request);
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "content-type",
-        "Access-Control-Max-Age": "86400",
-        Vary: "Origin",
-      },
+    return new Response(null, { headers: corsHeaders(origin) });
+  }
+
+  // Health / ping
+  if (mode === "api" && url.searchParams.get("op") === "ping") {
+    return json({ ok: true, ts: Date.now() }, {}, origin);
+  }
+
+  // Session info
+  if (mode === "api" && url.searchParams.get("op") === "sessionInfo") {
+    const cookies = parseCookies(request);
+    const role = cookies[SESSION_COOKIE] === "admin" ? "admin" : (cookies[SESSION_COOKIE] ? "user" : "user");
+    return json({ ok: true, info: { ok: true, role } }, {}, origin);
+  }
+
+  // Login (simple: username=admin → admin role; anything else → user)
+  if (mode === "api" && url.searchParams.get("op") === "login") {
+    if (request.method !== "POST") {
+      return json({ ok: false, message: "POST required" }, { status: 405 }, origin);
+    }
+    let body = {};
+    try { body = await request.json(); } catch {}
+    const username = (body.username || "").trim().toLowerCase();
+    const password = String(body.password || "");
+
+    // You can make this stricter if you like:
+    const isAdmin = username === "admin" && password.length > 0;
+
+    const headers = corsHeaders(origin);
+    headers.append("Set-Cookie", setCookie(SESSION_COOKIE, isAdmin ? "admin" : "user", oneDay));
+    headers.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: true, role: isAdmin ? "admin" : "user" }), { headers });
+  }
+
+  // Logout
+  if (mode === "api" && url.searchParams.get("op") === "logout") {
+    const headers = corsHeaders(origin);
+    // expire cookie
+    headers.append("Set-Cookie", setCookie(SESSION_COOKIE, "", 0));
+    headers.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: true }), { headers });
+  }
+
+  // Update (admin only) – proxy JSON body to GAS (?mode=api&op=update)
+  if (mode === "api" && url.searchParams.get("op") === "update") {
+    const cookies = parseCookies(request);
+    if (cookies[SESSION_COOKIE] !== "admin") {
+      return json({ success: false, message: "Unauthorized" }, { status: 401 }, origin);
+    }
+    let payload = {};
+    try { payload = await request.json(); } catch {}
+    const gasUrl = new URL(GAS_BASE);
+    gasUrl.searchParams.set("mode", "api");
+    gasUrl.searchParams.set("op", "update");
+
+    // Stream-safe: forward body, and stream response back without reading it.
+    const upstream = await fetch(gasUrl.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
+
+    // Pass through JSON as-is. Don't consume body here.
+    const h = corsHeaders(origin);
+    // Mirror content-type if present
+    const ct = upstream.headers.get("content-type");
+    if (ct) h.set("Content-Type", ct);
+    return new Response(upstream.body, { status: upstream.status, headers: h });
   }
 
-  const { mode = "", op = "" } = getQS(request.url);
+  // Data (public) – proxy GET to GAS (?mode=data)
+  if (mode === "data") {
+    const gasUrl = new URL(GAS_BASE);
+    gasUrl.searchParams.set("mode", "data");
+    // Stream-safe pass-through
+    const upstream = await fetch(gasUrl.toString(), { cf: { cacheTtl: 0, cacheEverything: false } });
 
-  if (mode === "api") return handleApi(op, request);
-
-  if (mode === "data" || mode === "update") {
-    if (!hasSession(request))
-      return json({ ok: false, error: "unauthorized" }, { status: 401 });
-    return proxyToGAS(mode, request);
+    const h = corsHeaders(origin);
+    const ct = upstream.headers.get("content-type") || "application/json";
+    h.set("Content-Type", ct);
+    return new Response(upstream.body, { status: upstream.status, headers: h });
   }
 
-  return json({ ok: false, error: "not_found" }, { status: 404 });
+  // Fallback
+  return json({ ok: false, message: "Unknown route" }, { status: 404 }, origin);
 }
