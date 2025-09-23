@@ -1,185 +1,453 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Global Hillview · Enviro Helpdesk Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<title>Global Hillview, Enviro Helpdesk Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
+
 <style>
-  :root { --bg:#f6f7fb; --card:#fff; --txt:#0f172a; --muted:#64748b; --brand:#2563eb; --pill:#eef2ff; --ok:#10b981; --warn:#f59e0b; --err:#ef4444; }
-  *{ box-sizing:border-box; font-family:Inter,system-ui,Arial; }
-  body{ margin:0; background:var(--bg); color:var(--txt); }
-  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; padding:18px 20px; background:#fff; position:sticky; top:0; z-index:2; box-shadow:0 1px 0 #eef; }
-  h1{ font-size:22px; margin:0; }
-  .btn{ background:var(--brand); color:#fff; border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; }
-  .btn[disabled]{ opacity:.7; cursor:wait; }
-  .spinner{ width:1em; height:1em; border:2px solid #fff; border-top-color:transparent; border-radius:50%; display:inline-block; vertical-align:-.2em; margin-right:.5em; animation:spin 1s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg);} }
-  .wrap{ padding:18px 20px; }
-  .stats{ display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:14px; margin-bottom:14px; }
-  .card{ background:var(--card); border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(2,6,23,.06);}
-  .pill{ display:inline-block; padding:2px 10px; border-radius:999px; background:var(--pill); font-weight:600; }
-  table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; background:#fff; }
-  th, td{ padding:12px 14px; border-bottom:1px solid #eef1f6; vertical-align:middle; }
-  th{ text-transform:uppercase; font-size:12px; letter-spacing:.03em; color:var(--muted); }
-  tr:last-child td{ border-bottom:0; }
-  select, input[type=text]{ padding:8px 10px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; }
-  .savebtn{ background:#111827; color:#fff; border:0; border-radius:10px; padding:8px 12px; cursor:pointer; }
-  .savebtn.saving{ opacity:.8; cursor:wait; }
-  .alert{ background:#fee2e2; color:#991b1b; border-radius:12px; padding:12px 14px; margin-top:12px; display:none; }
+  :root{
+    --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280; --text:#0f172a;
+    --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed; --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
+    --border:#e5e7eb; --hover:#f1f5f9;
+    --header-h: 72px; --controls-h: 0px;
+  }
+  .dark{
+    --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb;
+    --border:#1f2937; --hover:#0f172a;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,"Noto Sans"; margin:0; color:var(--text); background:var(--bg)}
+
+  header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand img{height:32px;width:auto;border-radius:6px}
+  header h1{font-size:20px;margin:0;font-weight:800}
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .switch{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
+  .btn:hover{background:var(--hover)}
+  .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
+  .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+  .btn.small{padding:4px 8px;font-size:12px}
+
+  .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+  .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+  .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
+  .card .value{font-size:20px;font-weight:800;margin-top:6px}
+  .card.total{border-left:6px solid var(--green)}
+  .card.open{border-left:6px solid var(--gray)}
+  .card.progress{border-left:6px solid var(--amber)}
+  .card.resolved{border-left:6px solid var(--blue)}
+  .card.avgtime{border-left:6px solid var(--cyan)}
+  .card.avgrating{border-left:6px solid var(--violet)}
+
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+  .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
+  tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
+  tr:hover td{background:var(--hover)}
+  .sortable{cursor:pointer}
+  .sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
+  .Open{background:#111827;color:#fff}
+  .InProgress{background:#f59e0b;color:#111}
+  .Resolved{background:#0d6efd;color:#fff}
+  .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
+  .media video,.media audio{width:140px;height:auto}
+  .cell-actions{display:flex;gap:6px;align-items:center}
+
+  .pagination{display:flex;align-items:center;gap:8px;padding:10px}
+  .spacer{flex:1}
+  .muted{color:var(--muted);font-size:12px}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
+  #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
+  .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
+  .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+  .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
+
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .saving{opacity:.8}
+  .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
+  @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
-  <div>
-    <button id="export" class="btn" style="background:#111827">Export CSV</button>
-    <button id="logout" class="btn">Logout</button>
+  <header>
+    <div class="brand">
+      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Breez Global Hill View logo">
+      <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
+    </div>
+    <div class="toolbar">
+      <label class="switch"><span>Timezone:</span>
+        <select id="tzSelect"><option value="local">Local</option><option value="utc">UTC</option></select>
+      </label>
+      <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
+      <button id="toggleDark" class="btn">Dark mode</button>
+      <button class="btn" id="export">Export CSV</button>
+      <button class="btn danger" id="logoutBtn" style="display:inline-flex;align-items:center;gap:8px">
+        <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
+      </button>
+    </div>
+  </header>
+
+  <div id="controls" class="sticky-controls">
+    <section class="kpis">
+      <div class="card total"><div class="label">Total</div><div id="kpiTotal" class="value">0</div></div>
+      <div class="card open"><div class="label">Open</div><div id="kpiOpen" class="value">0</div></div>
+      <div class="card progress"><div class="label">In Progress</div><div id="kpiProgress" class="value">0</div></div>
+      <div class="card resolved"><div class="label">Resolved</div><div id="kpiResolved" class="value">0</div></div>
+      <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="value">0m</div></div>
+      <div class="card avgrating"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="value">0</div></div>
+    </section>
+    <section class="filters">
+      <select id="towerFilter"><option value="">All Towers</option></select>
+      <select id="statusFilter"><option value="">All Status</option><option value="Open">Open</option><option value="InProgress">In Progress</option><option value="Resolved">Resolved</option></select>
+      <input type="date" id="fromDate" /><input type="date" id="toDate" />
+      <input type="text" id="search" placeholder="Search (ID, flat, issue, remark, user...)" style="min-width:260px" />
+      <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px" /></label>
+      <button id="applyBtn" class="btn primary">Apply</button><button id="resetBtn" class="btn">Reset</button>
+    </section>
   </div>
-</header>
 
-<div class="wrap">
-  <div class="stats">
-    <div class="card"><div class="pill">TOTAL</div><h2 id="sTotal">0</h2></div>
-    <div class="card"><div class="pill">OPEN</div><h2 id="sOpen">0</h2></div>
-    <div class="card"><div class="pill">IN PROGRESS</div><h2 id="sProg">0</h2></div>
-    <div class="card"><div class="pill">RESOLVED</div><h2 id="sRes">0</h2></div>
-  </div>
+  <div id="netError" class="banner error" style="display:none">Network error while fetching data.</div>
+  <div id="infoMsg" class="banner info" style="display:none">Showing cached data.</div>
 
-  <div id="err" class="alert"></div>
-
-  <div class="card">
-    <table id="tbl">
+  <div class="tablewrap">
+    <table id="grid">
       <thead>
         <tr>
-          <th>Tracking ID</th><th>Date & Time Raised</th><th>Tower</th><th>Flat</th>
-          <th>Issue</th><th>Description</th><th>Media</th>
-          <th>Status</th><th>Redressal Remark</th><th>User ID</th>
+          <th class="sortable" data-key="Tracking ID">Tracking ID</th>
+          <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
+          <th class="sortable" data-key="Tower">Tower</th>
+          <th class="sortable" data-key="Flat">Flat</th>
+          <th class="sortable" data-key="Issue">Issue</th>
+          <th class="sortable" data-key="Description">Description</th>
+          <th>Media</th>
+          <th class="sortable" data-key="Status">Status</th>
+          <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
+          <th class="sortable" data-key="User ID">User ID</th>
+          <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
+          <th class="sortable" data-key="__computed_time">Time Taken</th>
+          <th class="sortable" data-key="Feedback Rating">Feedback</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
+    <div class="pagination">
+      <button class="btn" id="prevPage">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button class="btn" id="nextPage">Next</button>
+      <div class="spacer"></div><span id="rowCount" class="muted"></span>
+    </div>
   </div>
-</div>
+
+  <div id="lightbox"><img id="lightbox-img" src="" alt="preview" /></div>
 
 <script>
+/* ===== helpers ===== */
 const $ = (id)=>document.getElementById(id);
-const qs = (sel, root=document)=>root.querySelector(sel);
+function fmtDate(d,tz){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tz==="utc"?s+" UTC":s; }
+function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
+function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
+function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
+function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
 
-async function api(path){
-  const res = await fetch(path, { credentials:"same-origin" });
+/* lightbox */
+$("lightbox").addEventListener("click", ()=>{ $("lightbox").style.display="none"; });
+function openLightbox(url){ $("lightbox-img").src=url; $("lightbox").style.display="flex"; }
+function renderMediaCell(url){
+  if(!url) return "<span class='muted'>No media</span>";
+  const esc=s=>String(s).replace(/"/g,"&quot;");
+  if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" alt="media" onclick="openLightbox('${esc(url)}')" /></div>`;
+  if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls><source src="${esc(url)}"></video></div>`;
+  if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`;
+  return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`;
+}
+
+/* API wrapper: tolerant to non-JSON bodies (GAS sometimes returns HTML) */
+async function api(path, opts){
+  const res = await fetch(path, { credentials:"same-origin", cache:"no-store", ...(opts||{}) });
   if (res.status === 401) { location.href="/login"; return; }
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return await res.json().catch(async()=>({ raw: await res.text() }));
+  const clone = res.clone();
+  try { return await clone.json(); }
+  catch { return { ok: res.ok, status: res.status, text: await res.text() }; }
 }
 
-async function requireSession(){
-  const r = await api("/api?mode=api&op=sessionInfo");
-  if (!r?.info?.ok) location.href="/login";
+/* ===== app state ===== */
+const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
+
+/* sticky heights (for nice shadows) */
+function setStickyHeights(){
+  const h=document.querySelector('header'); const c=$('controls');
+  if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px');
+  if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px');
+}
+addEventListener('resize', setStickyHeights);
+
+/* logout with animation */
+function setLogoutLoading(on){ const b=$('logoutBtn'), s=$('logoutSpin'), l=$('logoutLabel'); b.disabled=!!on; if(s) s.style.display=on?'inline-block':'none'; if(l) l.textContent=on?'Logging out…':'Logout'; }
+async function handleLogout(){
+  setLogoutLoading(true);
+  const r = await api("/api?mode=api&op=logout");
+  setLogoutLoading(false);
+  if(!(r && r.ok)){ alert("Logout failed: " + (r?.error||r?.text||"")); return; }
+  location.href="/login";
 }
 
-function setStats(rows){
-  $("sTotal").textContent = rows.length;
-  const open = rows.filter(r=>r.Status==="Open").length;
-  const prog = rows.filter(r=>r.Status==="InProgress" || r.Status==="In Progress").length;
-  const res = rows.filter(r=>r.Status==="Resolved").length;
-  $("sOpen").textContent = open;
-  $("sProg").textContent = prog;
-  $("sRes").textContent = res;
+/* ===== data ===== */
+function normalizeRows(rows){
+  return rows.map(r=>{
+    const raised = parseDateSafe(r["Date and Time Raised"]);
+    const resolved = parseDateSafe(r["Date and Time Resolved"]);
+    let ms = null;
+    if(raised && resolved) ms = Math.max(0, resolved - raised);
+    if(ms==null && r["Time Taken"]){
+      const m = String(r["Time Taken"]).match(/(\d+)\s*m/);
+      if(m) ms = parseInt(m[1],10)*60000;
+    }
+    return { ...r, __raised: raised, __resolved: resolved, __computed_time: ms };
+  });
 }
 
-function rowHtml(r){
-  const img = r["Media URL"] ? `<img src="${r["Media URL"]}" alt="" style="width:74px;height:74px;object-fit:cover;border-radius:10px;">` : "—";
-  const statusId = `st_${r["Tracking ID"]}`;
-  const remarkId = `rk_${r["Tracking ID"]}`;
-  const btnId = `sv_${r["Tracking ID"]}`;
-  return `<tr>
-    <td>${r["Tracking ID"]}</td>
-    <td>${r["Date and Time Raised"]}</td>
-    <td>${r["Tower"]}</td>
-    <td>${r["Flat"]}</td>
-    <td>${r["Issue"]}</td>
-    <td>${r["Description"]||""}</td>
-    <td>${img}</td>
-    <td><select id="${statusId}">
-      ${["Open","In Progress","Resolved"].map(x=>`<option ${r.Status?.startsWith(x)?"selected":""}>${x}</option>`).join("")}
-    </select></td>
-    <td>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="${remarkId}" type="text" value="${(r["Redressal Remark"]||"").replaceAll('"',"&quot;")}" placeholder="Remark" />
-        <button id="${btnId}" class="savebtn">Save</button>
-      </div>
-    </td>
-    <td>${r["User ID"]||""}</td>
-  </tr>`;
+function populateTowerFilter(data){
+  const sel = $("towerFilter");
+  const existing = new Set([...sel.options].map(o=>o.value));
+  [...new Set(data.map(d=>d.Tower).filter(Boolean))].sort().forEach(v=>{
+    if(!existing.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
+  });
 }
 
-async function loadData(){
-  $("err").style.display="none";
-  const tbody = qs("#tbl tbody");
-  tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;">
-    <span class="spinner" style="border-color:#111;border-top-color:transparent"></span> Loading…
-  </td></tr>`;
+async function fetchData(){
   try{
-    const data = await api("/api?mode=data");
-    if (!Array.isArray(data)) throw new Error("bad_json");
-    setStats(data);
-    tbody.innerHTML = data.map(rowHtml).join("");
-    data.forEach(r=>{
-      const id = r["Tracking ID"];
-      const btn = $( "sv_"+id );
-      btn.onclick = ()=>saveRow(id);
-    });
-  }catch(e){
-    $("err").textContent = `Network error while fetching data. ${e.message || ""}`;
-    $("err").style.display = "block";
-    qs("#tbl tbody").innerHTML = "";
+    const r = await api("/api?mode=data");
+    if(!(r && (Array.isArray(r) || r.ok))) throw new Error("bad_response");
+    const rows = Array.isArray(r) ? r : (r.data||[]);
+    state.lastFetchOk = true;
+    $("netError").style.display = "none";
+    $("infoMsg").style.display = "none";
+    state.all = normalizeRows(rows);
+    populateTowerFilter(state.all);
+    applyFilters();
+    setStickyHeights();
+  }catch(err){
+    state.lastFetchOk = false;
+    $("netError").style.display = "block";
+    if(state.all.length){ $("infoMsg").style.display = "block"; render(); }
   }
 }
 
+/* ===== filters & render ===== */
+function applyFilters(){
+  const tower = $("towerFilter").value;
+  const status = $("statusFilter").value;
+  const from = $("fromDate").value ? new Date($("fromDate").value) : null;
+  const to = $("toDate").value ? endOfDay($("toDate").value) : null;
+  const q = $("search").value.trim().toLowerCase();
+
+  state.filtered = state.all.filter(r=>{
+    if(tower && r.Tower !== tower) return false;
+    if(status && r.Status !== status) return false;
+    if(from && r.__raised && r.__raised < from) return false;
+    if(to && r.__raised && r.__raised > to) return false;
+    if(q){
+      const blob = [r["Tracking ID"], r["Tower"], r["Flat"], r["Issue"], r["Description"], r["Redressal Remark"], r["Status"], r["User ID"], r["Feedback Rating"]]
+        .map(x=>String(x||"").toLowerCase()).join(" ");
+      if(!blob.includes(q)) return false;
+    }
+    return true;
+  });
+  state.page = 1;
+  render();
+}
+
+function resetFilters(){
+  $("towerFilter").value = "";
+  $("statusFilter").value = "";
+  $("fromDate").value = "";
+  $("toDate").value = "";
+  $("search").value = "";
+  state.page = 1;
+  state.filtered = state.all.slice();
+  render();
+}
+
+function render(){
+  const {key, dir} = state.sort;
+  const data = state.filtered.slice().sort((a,b)=>{
+    const av = key==="__computed_time" ? a.__computed_time : (key==="Date and Time Raised" ? a.__raised : (key==="Date and Time Resolved" ? a.__resolved : a[key]));
+    const bv = key==="__computed_time" ? b.__computed_time : (key==="Date and Time Raised" ? b.__raised : (key==="Date and Time Resolved" ? b.__resolved : b[key]));
+    const aa = av==null ? "" : av, bb = bv==null ? "" : bv;
+    if(aa<bb) return dir==="asc"?-1:1; if(aa>bb) return dir==="asc"?1:-1; return 0;
+  });
+
+  const start = (state.page-1) * state.pageSize;
+  const slice = data.slice(start, start + state.pageSize);
+
+  const total = state.filtered.length;
+  const open = state.filtered.filter(x=>x.Status==="Open").length;
+  const progress = state.filtered.filter(x=>x.Status==="InProgress").length;
+  const resolvedRows = state.filtered.filter(x=>x.Status==="Resolved");
+  const resolved = resolvedRows.length;
+  const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
+  const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
+  const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
+
+  $("kpiTotal").textContent = total;
+  $("kpiOpen").textContent = open;
+  $("kpiProgress").textContent = progress;
+  $("kpiResolved").textContent = resolved;
+  $("kpiAvgTime").textContent = msToHuman(avgMs);
+  $("kpiAvgRating").textContent = avgRating;
+
+  const tbody = $("#grid tbody");
+  tbody.innerHTML = "";
+
+  slice.forEach(r=>{
+    const tr = document.createElement("tr");
+    const raisedStr = fmtDate(r.__raised, state.tz);
+    const resolvedStr = fmtDate(r.__resolved, state.tz);
+    const timeStr = msToHuman(r.__computed_time);
+
+    tr.innerHTML = `
+      <td><span class="muted" style="border-bottom:1px dashed var(--muted); cursor:copy" title="Click to copy" onclick="navigator.clipboard.writeText('${String(r["Tracking ID"]||"")}')">${r["Tracking ID"]||""}</span></td>
+      <td>${raisedStr}</td>
+      <td>${r["Tower"]||""}</td>
+      <td>${r["Flat"]||""}</td>
+      <td>${r["Issue"]||""}</td>
+      <td>${r["Description"]||""}</td>
+      <td>${renderMediaCell(r["Media URL"])}</td>
+
+      <td>
+        ${
+          state.isAdmin
+            ? `<select id="st_${r["Tracking ID"]}" class="edit-status">
+                 <option value="Open"${r["Status"]==="Open"?" selected":""}>Open</option>
+                 <option value="InProgress"${r["Status"]==="InProgress"?" selected":""}>In Progress</option>
+                 <option value="Resolved"${r["Status"]==="Resolved"?" selected":""}>Resolved</option>
+               </select>`
+            : `<span class="badge ${r["Status"]||""}">${r["Status"]||""}</span>`
+        }
+      </td>
+
+      <td>
+        ${
+          state.isAdmin
+            ? `<div class="cell-actions">
+                 <input id="rk_${r["Tracking ID"]}" class="edit-remark" value="${(r["Redressal Remark"]||"").replace(/"/g,'&quot;')}" placeholder="Remark" style="min-width:180px;max-width:360px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card)" />
+                 <button id="sv_${r["Tracking ID"]}" class="btn small">Save</button>
+               </div>`
+            : `${r["Redressal Remark"]||""}`
+        }
+      </td>
+
+      <td>${r["User ID"]||""}</td>
+      <td>${resolvedStr}</td>
+      <td>${timeStr}</td>
+      <td>${r["Feedback Rating"]||""}</td>
+    `;
+    tbody.appendChild(tr);
+
+    if (state.isAdmin) {
+      // handlers per row
+      $("sv_"+r["Tracking ID"])?.addEventListener("click", ()=>saveRow(String(r["Tracking ID"])));
+      $("st_"+r["Tracking ID"])?.addEventListener("change", ()=>saveRow(String(r["Tracking ID"])));
+      $("rk_"+r["Tracking ID"])?.addEventListener("keydown", (e)=>{
+        if((e.ctrlKey||e.metaKey) && e.key==="Enter"){ e.preventDefault(); saveRow(String(r["Tracking ID"])); }
+      });
+    }
+  });
+
+  document.querySelectorAll("th.sortable").forEach(th=>{
+    th.style.textDecoration = (th.dataset.key===state.sort.key) ? "underline" : "none";
+  });
+
+  const maxPage = Math.max(1, Math.ceil(data.length / state.pageSize));
+  $("pageInfo").textContent = `Page ${state.page} / ${maxPage}`;
+  $("rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
+}
+
+/* save (status/remark) with animated button */
 async function saveRow(id){
   const btn = $("sv_"+id);
-  const st = $("st_"+id).value;
-  const rk = $("rk_"+id).value.trim();
-  const txt = btn.textContent;
-  btn.classList.add("saving");
-  btn.innerHTML = '<span class="spinner"></span>Saving…';
+  const st = $("st_"+id)?.value || "";
+  const rk = $("rk_"+id)?.value?.trim() || "";
+  if(btn){ btn.disabled = true; btn.classList.add("saving"); btn.innerHTML = '<span class="spinner"></span>Saving…'; }
   try{
     const url = `/api?mode=update&op=save&id=${encodeURIComponent(id)}&status=${encodeURIComponent(st)}&remark=${encodeURIComponent(rk)}`;
     const r = await api(url);
-    if (!r?.ok) throw new Error(r?.error || "save_failed");
-    btn.textContent = "Saved";
-    setTimeout(()=>btn.textContent="Save", 1200);
+    if(!(r && (r.ok===true || r.success===true))) throw new Error(r?.error || `HTTP ${r?.status||""}`);
+    if(btn){ btn.textContent = "Saved"; setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; btn.classList.remove("saving"); }, 900); }
+    // refresh KPIs + computed fields
+    fetchData();
   }catch(e){
     alert("Save failed: " + (e.message || "error"));
-    btn.textContent = txt;
-  }finally{
-    btn.classList.remove("saving");
+    if(btn){ btn.textContent="Save"; btn.disabled=false; btn.classList.remove("saving"); }
   }
 }
 
-$("logout").onclick = async ()=>{
-  const btn = $("logout");
-  const txt = btn.textContent;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Logging out…';
-  try{
-    const r = await api("/api?mode=api&op=logout");
-    if (!r?.ok) throw new Error("Logout failed");
-    location.href = "/login";
-  }catch(e){
-    alert("Logout failed: " + (e.message || "Logout failed"));
-    btn.textContent = txt;
-    btn.disabled = false;
-  }
-};
+/* export CSV of current filter */
+function exportCSV(){
+  const rows = state.filtered.length ? state.filtered : state.all;
+  if(!rows.length){ alert("No data to export."); return; }
+  const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
+  const csv = [hdr.join(",")];
+  const q = v=>`"${String(v||"").replace(/"/g,'""')}"`;
+  rows.forEach(r=>{
+    const vals = [
+      r["Tracking ID"],
+      r["Date and Time Raised"] || r["Date & Time Raised"] || "",
+      r["Tower"], r["Flat"], r["Issue"], r["Description"],
+      r["Media URL"], r["Status"], r["Redressal Remark"], r["User ID"],
+      r["Date and Time Resolved"] || r["Date & Time Resolved"] || "",
+      r["Time Taken"], r["Feedback Rating"]
+    ].map(q);
+    csv.push(vals.join(","));
+  });
+  const blob = new Blob([csv.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "helpdesk.csv"; a.click();
+}
 
-$("export").onclick = ()=>location.href="/api?mode=data"; // raw JSON for quick export
+/* ===== init ===== */
+async function init(){
+  $("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
+  $("export").addEventListener("click", exportCSV);
+  $("applyBtn").addEventListener("click", applyFilters);
+  $("resetBtn").addEventListener("click", resetFilters);
+  $("prevPage").addEventListener("click", ()=>{ if(state.page>1){ state.page--; render(); }});
+  $("nextPage").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(state.filtered.length/state.pageSize)); if(state.page<max){ state.page++; render(); }});
+  $("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
+  $("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
+  $("search").addEventListener("input", debounce(applyFilters, 250));
+  $("autoRefresh").addEventListener("change", ()=>{});
+  $("logoutBtn").addEventListener("click", handleLogout);
 
-// boot
-requireSession().then(loadData);
+  // role
+  const info = await api("/api?mode=api&op=sessionInfo");
+  state.isAdmin = !!(info && info.info && info.info.role === "admin");
+
+  // data + timer
+  await fetchData();
+  state.timer = setInterval(()=>{ if($("autoRefresh").checked) fetchData(); }, 60000);
+
+  // sortable headers
+  document.querySelectorAll("th.sortable").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.dataset.key;
+      if(state.sort.key === key){ state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc"; }
+      else { state.sort.key = key; state.sort.dir = "asc"; }
+      render();
+    });
+  });
+
+  setStickyHeights();
+}
+
+window.onload = init;
 </script>
 </body>
 </html>
