@@ -1,31 +1,28 @@
 // functions/api/[[path]].js
-// Cloudflare Pages Functions – unified /api endpoint that proxies to GAS
-// Stream-safe (we never read the body unless we need to), CORS, simple session.
+// Cloudflare Pages Functions – unified /api endpoint that proxies to your GAS app.
 
-const GAS_BASE = "https://script.google.com/macros/s/AKfycbwrM29XMx5aQrDGj3gi64TukZDi5_M3dVj7ZkJWQky4jN1XYmlZhQf1WcD07NqzB08dLw/exec";
+const GAS_BASE =
+  "https://script.google.com/macros/s/AKfycbzgtXFMYHb2Vg29UiFMlHx2Wm-KzWFXb35o56Bx3rrjfSJ8inP04I8HuVVO5cceBWftsA/exec";
 
 const ALLOW_ORIGINS = new Set([
   "https://bot-81z.pages.dev",
   "https://globalhillview1.github.io",
-  "https://globalhillview1.github.io/GHVBot"
+  "https://globalhillview1.github.io/GHVBot",
 ]);
 
-const SESSION_COOKIE = "ghv_session"; // value: "admin" | "user"
+const SESSION_COOKIE = "ghv_session";
 const oneDay = 24 * 60 * 60;
 
 function corsHeaders(origin) {
-  const hdrs = new Headers();
+  const h = new Headers();
   if (origin && ALLOW_ORIGINS.has(origin)) {
-    hdrs.set("Access-Control-Allow-Origin", origin);
-    hdrs.set("Vary", "Origin");
-    hdrs.set("Access-Control-Allow-Credentials", "true");
-    hdrs.set("Access-Control-Allow-Headers", "content-type");
-    hdrs.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  } else {
-    // default to no wildcard credentials to keep things strict
-    hdrs.set("Access-Control-Allow-Origin", "null");
+    h.set("Access-Control-Allow-Origin", origin);
+    h.set("Vary", "Origin");
+    h.set("Access-Control-Allow-Credentials", "true");
+    h.set("Access-Control-Allow-Headers", "content-type");
+    h.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   }
-  return hdrs;
+  return h;
 }
 
 function json(data, init = {}, origin) {
@@ -45,69 +42,51 @@ function parseCookies(req) {
 }
 
 function setCookie(name, value, maxAgeSeconds) {
-  const attrs = [
-    `${name}=${encodeURIComponent(value)}`,
-    `Path=/`,
-    `SameSite=Lax`,
-    `HttpOnly`,
-    `Secure`,
-    `Max-Age=${maxAgeSeconds}`
-  ];
-  return attrs.join("; ");
+  return `${name}=${encodeURIComponent(value)}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}`;
 }
 
-export async function onRequest(context) {
-  const { request } = context;
+export async function onRequest({ request }) {
   const url = new URL(request.url);
   const origin = request.headers.get("origin") || "";
   const mode = url.searchParams.get("mode") || "";
 
-  // CORS preflight
+  // OPTIONS preflight
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders(origin) });
   }
 
-  // Health / ping
+  // ping / health
   if (mode === "api" && url.searchParams.get("op") === "ping") {
     return json({ ok: true, ts: Date.now() }, {}, origin);
   }
 
-  // Session info
+  // session info
   if (mode === "api" && url.searchParams.get("op") === "sessionInfo") {
-    const cookies = parseCookies(request);
-    const role = cookies[SESSION_COOKIE] === "admin" ? "admin" : (cookies[SESSION_COOKIE] ? "user" : "user");
+    const role = parseCookies(request)[SESSION_COOKIE] === "admin" ? "admin" : "user";
     return json({ ok: true, info: { ok: true, role } }, {}, origin);
   }
 
-  // Login (simple: username=admin → admin role; anything else → user)
+  // login
   if (mode === "api" && url.searchParams.get("op") === "login") {
-    if (request.method !== "POST") {
-      return json({ ok: false, message: "POST required" }, { status: 405 }, origin);
-    }
     let body = {};
     try { body = await request.json(); } catch {}
-    const username = (body.username || "").trim().toLowerCase();
-    const password = String(body.password || "");
-
-    // You can make this stricter if you like:
-    const isAdmin = username === "admin" && password.length > 0;
-
-    const headers = corsHeaders(origin);
-    headers.append("Set-Cookie", setCookie(SESSION_COOKIE, isAdmin ? "admin" : "user", oneDay));
-    headers.set("Content-Type", "application/json");
-    return new Response(JSON.stringify({ ok: true, role: isAdmin ? "admin" : "user" }), { headers });
+    const { username, password } = body;
+    const isAdmin = username?.toLowerCase() === "admin" && password?.length > 0;
+    const h = corsHeaders(origin);
+    h.append("Set-Cookie", setCookie(SESSION_COOKIE, isAdmin ? "admin" : "user", oneDay));
+    h.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: true, role: isAdmin ? "admin" : "user" }), { headers: h });
   }
 
-  // Logout
+  // logout
   if (mode === "api" && url.searchParams.get("op") === "logout") {
-    const headers = corsHeaders(origin);
-    // expire cookie
-    headers.append("Set-Cookie", setCookie(SESSION_COOKIE, "", 0));
-    headers.set("Content-Type", "application/json");
-    return new Response(JSON.stringify({ ok: true }), { headers });
+    const h = corsHeaders(origin);
+    h.append("Set-Cookie", setCookie(SESSION_COOKIE, "", 0));
+    h.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: true }), { headers: h });
   }
 
-  // Update (admin only) – proxy JSON body to GAS (?mode=api&op=update)
+  // update (admin only)
   if (mode === "api" && url.searchParams.get("op") === "update") {
     const cookies = parseCookies(request);
     if (cookies[SESSION_COOKIE] !== "admin") {
@@ -118,35 +97,27 @@ export async function onRequest(context) {
     const gasUrl = new URL(GAS_BASE);
     gasUrl.searchParams.set("mode", "api");
     gasUrl.searchParams.set("op", "update");
-
-    // Stream-safe: forward body, and stream response back without reading it.
-    const upstream = await fetch(gasUrl.toString(), {
+    const upstream = await fetch(gasUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-
-    // Pass through JSON as-is. Don't consume body here.
-    const h = corsHeaders(origin);
-    // Mirror content-type if present
-    const ct = upstream.headers.get("content-type");
-    if (ct) h.set("Content-Type", ct);
-    return new Response(upstream.body, { status: upstream.status, headers: h });
-  }
-
-  // Data (public) – proxy GET to GAS (?mode=data)
-  if (mode === "data") {
-    const gasUrl = new URL(GAS_BASE);
-    gasUrl.searchParams.set("mode", "data");
-    // Stream-safe pass-through
-    const upstream = await fetch(gasUrl.toString(), { cf: { cacheTtl: 0, cacheEverything: false } });
-
     const h = corsHeaders(origin);
     const ct = upstream.headers.get("content-type") || "application/json";
     h.set("Content-Type", ct);
     return new Response(upstream.body, { status: upstream.status, headers: h });
   }
 
-  // Fallback
-  return json({ ok: false, message: "Unknown route" }, { status: 404 }, origin);
+  // data
+  if (mode === "data") {
+    const gasUrl = new URL(GAS_BASE);
+    gasUrl.searchParams.set("mode", "data");
+    const upstream = await fetch(gasUrl.toString(), { cf: { cacheTtl: 0, cacheEverything: false } });
+    const h = corsHeaders(origin);
+    const ct = upstream.headers.get("content-type") || "application/json";
+    h.set("Content-Type", ct);
+    return new Response(upstream.body, { status: upstream.status, headers: h });
+  }
+
+  return json({ ok: false, message: "Not found" }, { status: 404 }, origin);
 }
