@@ -1,284 +1,185 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Helpdesk Dashboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Global Hillview · Enviro Helpdesk Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#f6f8fb;--ink:#0f172a;--muted:#6b7280;--card:#fff;--accent:#2563eb;--accent-600:#1d4ed8;
-    --ok:#16a34a;--warn:#ca8a04;--chip:#eef2ff;--ring:0 0 0 .25rem rgba(37,99,235,.25);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Inter',system-ui}
-  header{
-    position:sticky;top:0;z-index:10;background:linear-gradient(#fff,#fffcc0 0) top/100% 0 no-repeat,#fff;
-    border-bottom:1px solid #e5e7eb;display:flex;gap:16px;align-items:center;justify-content:space-between;
-    padding:12px 18px
-  }
-  .title{font-size:18px;font-weight:700;letter-spacing:-.01em}
-  .row{display:flex;gap:10px;align-items:center}
-  select,input[type="date"],input[type="text"]{
-    border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:6px 10px;outline:0
-  }
-  select:focus,input:focus{border-color:var(--accent);box-shadow:var(--ring)}
-  .btn{
-    border:0;border-radius:10px;padding:8px 12px;background:var(--accent);color:#fff;font-weight:700;
-    cursor:pointer;display:inline-grid;grid-auto-flow:column;gap:8px;align-items:center
-  }
-  .btn:hover{background:var(--accent-600)}
-  .btn.secondary{background:#1118270d;color:#111827;border:1px solid #e5e7eb}
-  .spinner{
-    width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;
-    display:inline-block;animation:spin .7s linear infinite
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  main{max-width:1200px;margin:16px auto;padding:0 16px}
-  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;padding:14px}
-  .stat h3{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase}
-  .stat .n{font-size:28px;font-weight:800}
-  .table{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;overflow:auto}
-  table{border-collapse:separate;border-spacing:0;width:100%}
-  th,td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-  th{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
-  tbody tr:last-child td{border-bottom:0}
-  .chip{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--chip);font-weight:700}
-  .status{min-width:120px}
-  .save-btn{min-width:84px}
-  .save-btn.saving{background:#11182714;color:#111827;border:1px solid #e5e7eb}
-  .save-btn.saved{background:var(--ok);color:#fff}
-  .toast{
-    position:fixed;right:16px;bottom:16px;background:#111827; color:#fff;padding:10px 14px;border-radius:10px;
-    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(6px);pointer-events:none
-  }
-  .toast.show{animation:toast .9s ease forwards}
-  @keyframes toast{20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
-  .hidden{display:none !important}
+  :root { --bg:#f6f7fb; --card:#fff; --txt:#0f172a; --muted:#64748b; --brand:#2563eb; --pill:#eef2ff; --ok:#10b981; --warn:#f59e0b; --err:#ef4444; }
+  *{ box-sizing:border-box; font-family:Inter,system-ui,Arial; }
+  body{ margin:0; background:var(--bg); color:var(--txt); }
+  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; padding:18px 20px; background:#fff; position:sticky; top:0; z-index:2; box-shadow:0 1px 0 #eef; }
+  h1{ font-size:22px; margin:0; }
+  .btn{ background:var(--brand); color:#fff; border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; }
+  .btn[disabled]{ opacity:.7; cursor:wait; }
+  .spinner{ width:1em; height:1em; border:2px solid #fff; border-top-color:transparent; border-radius:50%; display:inline-block; vertical-align:-.2em; margin-right:.5em; animation:spin 1s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .wrap{ padding:18px 20px; }
+  .stats{ display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:14px; margin-bottom:14px; }
+  .card{ background:var(--card); border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(2,6,23,.06);}
+  .pill{ display:inline-block; padding:2px 10px; border-radius:999px; background:var(--pill); font-weight:600; }
+  table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; background:#fff; }
+  th, td{ padding:12px 14px; border-bottom:1px solid #eef1f6; vertical-align:middle; }
+  th{ text-transform:uppercase; font-size:12px; letter-spacing:.03em; color:var(--muted); }
+  tr:last-child td{ border-bottom:0; }
+  select, input[type=text]{ padding:8px 10px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; }
+  .savebtn{ background:#111827; color:#fff; border:0; border-radius:10px; padding:8px 12px; cursor:pointer; }
+  .savebtn.saving{ opacity:.8; cursor:wait; }
+  .alert{ background:#fee2e2; color:#991b1b; border-radius:12px; padding:12px 14px; margin-top:12px; display:none; }
 </style>
 </head>
 <body>
-
 <header>
-  <div class="title">Global Hillview, Enviro Helpdesk Dashboard</div>
-  <div class="row">
-    <button class="btn secondary" id="export">Export CSV</button>
-    <button class="btn" id="logoutBtn"><span class="txt">Logout</span></button>
+  <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
+  <div>
+    <button id="export" class="btn" style="background:#111827">Export CSV</button>
+    <button id="logout" class="btn">Logout</button>
   </div>
 </header>
 
-<main>
-  <section class="stats" id="stats">
-    <div class="stat"><h3>Total</h3><div class="n" id="sTotal">0</div></div>
-    <div class="stat"><h3>Open</h3><div class="n" id="sOpen">0</div></div>
-    <div class="stat"><h3>In Progress</h3><div class="n" id="sProg">0</div></div>
-    <div class="stat"><h3>Resolved</h3><div class="n" id="sDone">0</div></div>
-    <div class="stat"><h3>Avg Resolution</h3><div class="n" id="sAvg">0m</div></div>
-  </section>
+<div class="wrap">
+  <div class="stats">
+    <div class="card"><div class="pill">TOTAL</div><h2 id="sTotal">0</h2></div>
+    <div class="card"><div class="pill">OPEN</div><h2 id="sOpen">0</h2></div>
+    <div class="card"><div class="pill">IN PROGRESS</div><h2 id="sProg">0</h2></div>
+    <div class="card"><div class="pill">RESOLVED</div><h2 id="sRes">0</h2></div>
+  </div>
 
-  <section class="table">
-    <table id="grid">
+  <div id="err" class="alert"></div>
+
+  <div class="card">
+    <table id="tbl">
       <thead>
         <tr>
-          <th>Tracking ID</th>
-          <th>Date &amp; Time Raised</th>
-          <th>Tower</th>
-          <th>Flat</th>
-          <th>Issue</th>
-          <th>Description</th>
-          <th>Media</th>
-          <th class="status">Status</th>
-          <th>Redressal Remark</th>
-          <th>User ID</th>
-          <th>Date &amp; Time Resolved</th>
-          <th>Time Taken</th>
-          <th>Feedback</th>
-          <th></th>
+          <th>Tracking ID</th><th>Date & Time Raised</th><th>Tower</th><th>Flat</th>
+          <th>Issue</th><th>Description</th><th>Media</th>
+          <th>Status</th><th>Redressal Remark</th><th>User ID</th>
         </tr>
       </thead>
-      <tbody id="rows">
-        <tr><td colspan="14" style="text-align:center;padding:24px">Loading…</td></tr>
-      </tbody>
+      <tbody></tbody>
     </table>
-  </section>
-</main>
-
-<div class="toast" id="toast">Saved</div>
+  </div>
+</div>
 
 <script>
-const $ = (s, el=document) => el.querySelector(s);
+const $ = (id)=>document.getElementById(id);
+const qs = (sel, root=document)=>root.querySelector(sel);
 
-const t = (html) => {
-  const tr = document.createElement('tr');
-  tr.innerHTML = html.trim();
-  return tr;
+async function api(path){
+  const res = await fetch(path, { credentials:"same-origin" });
+  if (res.status === 401) { location.href="/login"; return; }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json().catch(async()=>({ raw: await res.text() }));
 }
 
-const STATUS = ['Open','In Progress','Resolved'];
-
-let SESSION = { ok:false, role:'user' };
-
-async function ensureSession(){
-  const res = await fetch('/api?mode=sessionInfo', {credentials:'include'});
-  const j = await safeJSON(res);
-  SESSION = { ok: !!j?.info?.ok, role: j?.info?.role || 'user' };
+async function requireSession(){
+  const r = await api("/api?mode=api&op=sessionInfo");
+  if (!r?.info?.ok) location.href="/login";
 }
 
-function toast(msg){
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), 1200);
+function setStats(rows){
+  $("sTotal").textContent = rows.length;
+  const open = rows.filter(r=>r.Status==="Open").length;
+  const prog = rows.filter(r=>r.Status==="InProgress" || r.Status==="In Progress").length;
+  const res = rows.filter(r=>r.Status==="Resolved").length;
+  $("sOpen").textContent = open;
+  $("sProg").textContent = prog;
+  $("sRes").textContent = res;
 }
 
-function savingButton(btn){
-  btn.classList.remove('saved');
-  btn.classList.add('saving');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Saving…';
-}
-function savedButton(btn){
-  btn.classList.remove('saving');
-  btn.classList.add('saved');
-  btn.disabled = false;
-  btn.textContent = 'Saved';
-  setTimeout(()=>{btn.classList.remove('saved');btn.textContent='Save';}, 1100);
-}
-function failedButton(btn, msg='Failed'){
-  btn.classList.remove('saving','saved');
-  btn.disabled = false;
-  btn.textContent = msg;
-  setTimeout(()=>btn.textContent='Save', 1200);
+function rowHtml(r){
+  const img = r["Media URL"] ? `<img src="${r["Media URL"]}" alt="" style="width:74px;height:74px;object-fit:cover;border-radius:10px;">` : "—";
+  const statusId = `st_${r["Tracking ID"]}`;
+  const remarkId = `rk_${r["Tracking ID"]}`;
+  const btnId = `sv_${r["Tracking ID"]}`;
+  return `<tr>
+    <td>${r["Tracking ID"]}</td>
+    <td>${r["Date and Time Raised"]}</td>
+    <td>${r["Tower"]}</td>
+    <td>${r["Flat"]}</td>
+    <td>${r["Issue"]}</td>
+    <td>${r["Description"]||""}</td>
+    <td>${img}</td>
+    <td><select id="${statusId}">
+      ${["Open","In Progress","Resolved"].map(x=>`<option ${r.Status?.startsWith(x)?"selected":""}>${x}</option>`).join("")}
+    </select></td>
+    <td>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="${remarkId}" type="text" value="${(r["Redressal Remark"]||"").replaceAll('"',"&quot;")}" placeholder="Remark" />
+        <button id="${btnId}" class="savebtn">Save</button>
+      </div>
+    </td>
+    <td>${r["User ID"]||""}</td>
+  </tr>`;
 }
 
 async function loadData(){
-  const res = await fetch('/api?mode=data', {credentials:'include'});
-  const j = await safeJSON(res);
-
-  const body = $('#rows');
-  body.innerHTML = '';
-  let total=0, open=0, prog=0, done=0;
-
-  (j||[]).forEach(row => {
-    total++;
-    if(row.Status==='Open') open++;
-    else if(row.Status==='InProgress' || row.Status==='In Progress') prog++;
-    else if(row.Status==='Resolved') done++;
-
-    const media = row["Media URL"] ? `<img src="${row["Media URL"]}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb" onerror="this.replaceWith(document.createTextNode('—'))">` : '—';
-
-    const statusSel = `
-      <select class="status-input" ${SESSION.role!=='admin'?'disabled':''}>
-        ${STATUS.map(s => `<option ${matchStatus(row.Status)===s?'selected':''}>${s}</option>`).join('')}
-      </select>`;
-
-    const remark = `
-      <input class="remark-input" type="text" placeholder="Remark" value="${escapeAttr(row["Redressal Remark"]||'')}" ${SESSION.role!=='admin'?'disabled':''} />`;
-
-    const saveBtn = `<button class="btn save-btn ${SESSION.role!=='admin'?'hidden':''}">Save</button>`;
-
-    body.appendChild(t(`
-      <tr data-id="${row["Tracking ID"]}">
-        <td>${row["Tracking ID"]}</td>
-        <td>${fmt(row["Date and Time Raised"])}</td>
-        <td>${row["Tower"]||'—'}</td>
-        <td>${row["Flat"]||'—'}</td>
-        <td>${row["Issue"]||'—'}</td>
-        <td>${row["Description"]||'—'}</td>
-        <td>${media}</td>
-        <td>${statusSel}</td>
-        <td>${remark}</td>
-        <td>${row["User ID"]||'—'}</td>
-        <td>${fmt(row["Date and Time Resolved"])||'—'}</td>
-        <td>${row["Time Taken"]||'—'}</td>
-        <td>${row["Feedback Rating"]||'—'}</td>
-        <td>${saveBtn}</td>
-      </tr>
-    `));
-  });
-
-  $('#sTotal').textContent=total;
-  $('#sOpen').textContent=open;
-  $('#sProg').textContent=prog;
-  $('#sDone').textContent=done;
-  // Simple proxy for average resolution available or not
-  $('#sAvg').textContent = j?.length? (j[0]["Time Taken"]||'0m') : '0m';
-
-  // Wire save handlers
-  $('#rows').addEventListener('click', async (ev) => {
-    const btn = ev.target.closest('.save-btn');
-    if(!btn) return;
-    const tr = btn.closest('tr');
-    const id = tr.dataset.id;
-    const status = $('.status-input', tr).value;
-    const remark = $('.remark-input', tr).value.trim();
-
-    savingButton(btn);
-    try{
-      const r = await fetch('/api?mode=update', {
-        method:'POST',
-        headers:{'content-type':'application/json'},
-        body: JSON.stringify({ id, status, remark }),
-        credentials:'include'
-      });
-      const j = await safeJSON(r);
-      if(!j?.ok) throw new Error(j?.error||'Update failed');
-      savedButton(btn);
-      toast('Saved');
-    }catch(ex){
-      failedButton(btn, 'Failed');
-      alert(`Save failed: ${ex.message}`);
-    }
-  });
+  $("err").style.display="none";
+  const tbody = qs("#tbl tbody");
+  tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;">
+    <span class="spinner" style="border-color:#111;border-top-color:transparent"></span> Loading…
+  </td></tr>`;
+  try{
+    const data = await api("/api?mode=data");
+    if (!Array.isArray(data)) throw new Error("bad_json");
+    setStats(data);
+    tbody.innerHTML = data.map(rowHtml).join("");
+    data.forEach(r=>{
+      const id = r["Tracking ID"];
+      const btn = $( "sv_"+id );
+      btn.onclick = ()=>saveRow(id);
+    });
+  }catch(e){
+    $("err").textContent = `Network error while fetching data. ${e.message || ""}`;
+    $("err").style.display = "block";
+    qs("#tbl tbody").innerHTML = "";
+  }
 }
 
-$('#logoutBtn').addEventListener('click', async () => {
-  const btn = $('#logoutBtn'); const txt = $('.txt', btn);
-  txt.innerHTML = '<span class="spinner"></span> Logging out…';
+async function saveRow(id){
+  const btn = $("sv_"+id);
+  const st = $("st_"+id).value;
+  const rk = $("rk_"+id).value.trim();
+  const txt = btn.textContent;
+  btn.classList.add("saving");
+  btn.innerHTML = '<span class="spinner"></span>Saving…';
+  try{
+    const url = `/api?mode=update&op=save&id=${encodeURIComponent(id)}&status=${encodeURIComponent(st)}&remark=${encodeURIComponent(rk)}`;
+    const r = await api(url);
+    if (!r?.ok) throw new Error(r?.error || "save_failed");
+    btn.textContent = "Saved";
+    setTimeout(()=>btn.textContent="Save", 1200);
+  }catch(e){
+    alert("Save failed: " + (e.message || "error"));
+    btn.textContent = txt;
+  }finally{
+    btn.classList.remove("saving");
+  }
+}
+
+$("logout").onclick = async ()=>{
+  const btn = $("logout");
+  const txt = btn.textContent;
   btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Logging out…';
   try{
-    const r = await fetch('/api?mode=logout', {method:'POST', credentials:'include'});
-    const j = await safeJSON(r);
-    if(!j?.ok) throw new Error('Logout failed');
-    txt.textContent='Logged out';
-    setTimeout(()=> location.replace('/login'), 250);
-  }catch(ex){
-    btn.disabled=false; txt.textContent='Logout';
-    alert(`Logout failed: ${ex.message}`);
+    const r = await api("/api?mode=api&op=logout");
+    if (!r?.ok) throw new Error("Logout failed");
+    location.href = "/login";
+  }catch(e){
+    alert("Logout failed: " + (e.message || "Logout failed"));
+    btn.textContent = txt;
+    btn.disabled = false;
   }
-});
+};
 
-function matchStatus(s){
-  if(!s) return 'Open';
-  s = String(s).toLowerCase();
-  if(s.startsWith('in')) return 'In Progress';
-  if(s.startsWith('res')) return 'Resolved';
-  return 'Open';
-}
-function fmt(v){ return v || ''; }
-function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
+$("export").onclick = ()=>location.href="/api?mode=data"; // raw JSON for quick export
 
-async function safeJSON(res){
-  const text = await res.text();
-  try{ return JSON.parse(text); }
-  catch{
-    // If Cloudflare (or a 404) returns HTML, avoid the “Unexpected token '<'” crash
-    throw new Error(`Unexpected token '<', "${text.slice(0,20)}"... is not valid JSON`);
-  }
-}
-
-// bootstrap
-(async function init(){
-  try{
-    await ensureSession();          // decides editability
-    await loadData();
-  }catch(ex){
-    alert('Network error while fetching data.\n' + ex.message);
-    $('#rows').innerHTML = `<tr><td colspan="14" style="text-align:center;padding:24px;color:#b91c1c;background:#fee2e2;border-top:1px solid #fecaca">Network error while fetching data.</td></tr>`;
-  }
-})();
+// boot
+requireSession().then(loadData);
 </script>
 </body>
 </html>
