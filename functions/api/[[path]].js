@@ -2,7 +2,7 @@
 // Cloudflare Pages Functions — file-based routing for /api/*
 // Proxies ALL verbs to your GAS Web App and adds helpful CORS.
 
-const GAS_BASE = "https://script.google.com/macros/s/AKfycbwrM29XMx5aQrDGj3gi64TukZDi5_M3dVj7ZkJWQky4jN1XYmlZhQf1WcD07NqzB08dLw/exec";
+const GAS_BASE = "https://script.google.com/macros/s/AKfycbzgtXFMYHb2Vg29UiFMlHx2Wm-KzWFXb35o56Bx3rrjfSJ8inP04I8HuVVO5cceBWftsA/exec";
 
 const ALLOW_ORIGINS = new Set([
   "https://globalhillview1.github.io",
