@@ -1,453 +1,422 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8"/>
 <title>Global Hillview, Enviro Helpdesk Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
-
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM"/>
 <style>
-  :root{
-    --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280; --text:#0f172a;
-    --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed; --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
-    --border:#e5e7eb; --hover:#f1f5f9;
-    --header-h: 72px; --controls-h: 0px;
-  }
-  .dark{
-    --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb;
-    --border:#1f2937; --hover:#0f172a;
-  }
+  :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9;--header-h:72px;--controls-h:0px}
+  .dark{--bg:#0b1220;--card:#121a2a;--muted:#9aa4b2;--text:#e5e7eb;--border:#1f2937;--hover:#0f172a}
   *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,"Noto Sans"; margin:0; color:var(--text); background:var(--bg)}
-
-  header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;background:var(--bg);color:var(--text)}
+  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
   .brand{display:flex;align-items:center;gap:10px}
-  .brand img{height:32px;width:auto;border-radius:6px}
-  header h1{font-size:20px;margin:0;font-weight:800}
-  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-  .switch{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
-  .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
+  .brand img{height:32px;border-radius:6px}
+  h1{margin:0;font-size:20px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .switch,.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px}
+  .switch{display:inline-flex;gap:8px;align-items:center}
+  .btn{cursor:pointer}
   .btn:hover{background:var(--hover)}
   .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
   .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
-  .btn.small{padding:4px 8px;font-size:12px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+  .sticky-controls{position:sticky;top:var(--header-h);z-index:5;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
   .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
   .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
   .card .value{font-size:20px;font-weight:800;margin-top:6px}
-  .card.total{border-left:6px solid var(--green)}
-  .card.open{border-left:6px solid var(--gray)}
-  .card.progress{border-left:6px solid var(--amber)}
-  .card.resolved{border-left:6px solid var(--blue)}
-  .card.avgtime{border-left:6px solid var(--cyan)}
-  .card.avgrating{border-left:6px solid var(--violet)}
+  .card.total{border-left:6px solid var(--green)} .card.open{border-left:6px solid var(--gray)}
+  .card.progress{border-left:6px solid var(--amber)} .card.resolved{border-left:6px solid var(--blue)}
+  .card.avgtime{border-left:6px solid var(--cyan)} .card.avgrating{border-left:6px solid var(--violet)}
 
-  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
   table{width:100%;border-collapse:separate;border-spacing:0}
-  thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
+  thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);padding:10px;text-align:left;font-weight:700;font-size:13px}
   tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
   tr:hover td{background:var(--hover)}
-  .sortable{cursor:pointer}
-  .sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
+  .sortable{cursor:pointer} .sortable:after{content:" ⇅";color:var(--muted);font-size:12px}
   .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
-  .Open{background:#111827;color:#fff}
-  .InProgress{background:#f59e0b;color:#111}
-  .Resolved{background:#0d6efd;color:#fff}
+  .Open{background:#111827;color:#fff} .InProgress{background:#f59e0b;color:#111} .Resolved{background:#0d6efd;color:#fff}
   .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
-  .media video,.media audio{width:140px;height:auto}
-  .cell-actions{display:flex;gap:6px;align-items:center}
-
-  .pagination{display:flex;align-items:center;gap:8px;padding:10px}
-  .spacer{flex:1}
-  .muted{color:var(--muted);font-size:12px}
-  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
-  #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
-  .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
+  .pagination{display:flex;gap:8px;align-items:center;padding:10px}
+  .spacer{flex:1} .muted{color:var(--muted);font-size:12px}
+  .banner{display:none;margin:10px 20px;padding:10px 12px;border-radius:12px;border:1px solid var(--border)}
   .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
   .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
-
-  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .saving{opacity:.8}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;align-items:center;justify-content:center}
+  #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
+  .edit-remark{min-width:180px;max-width:360px;max-height:76px;overflow:auto;outline:1px solid var(--border);border-radius:8px;padding:6px 8px;background:var(--card)}
   .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
-  @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}} @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Breez Global Hill View logo">
-      <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
-    </div>
-    <div class="toolbar">
-      <label class="switch"><span>Timezone:</span>
-        <select id="tzSelect"><option value="local">Local</option><option value="utc">UTC</option></select>
-      </label>
-      <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
-      <button id="toggleDark" class="btn">Dark mode</button>
-      <button class="btn" id="export">Export CSV</button>
-      <button class="btn danger" id="logoutBtn" style="display:inline-flex;align-items:center;gap:8px">
-        <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
-      </button>
-    </div>
-  </header>
-
-  <div id="controls" class="sticky-controls">
-    <section class="kpis">
-      <div class="card total"><div class="label">Total</div><div id="kpiTotal" class="value">0</div></div>
-      <div class="card open"><div class="label">Open</div><div id="kpiOpen" class="value">0</div></div>
-      <div class="card progress"><div class="label">In Progress</div><div id="kpiProgress" class="value">0</div></div>
-      <div class="card resolved"><div class="label">Resolved</div><div id="kpiResolved" class="value">0</div></div>
-      <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="value">0m</div></div>
-      <div class="card avgrating"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="value">0</div></div>
-    </section>
-    <section class="filters">
-      <select id="towerFilter"><option value="">All Towers</option></select>
-      <select id="statusFilter"><option value="">All Status</option><option value="Open">Open</option><option value="InProgress">In Progress</option><option value="Resolved">Resolved</option></select>
-      <input type="date" id="fromDate" /><input type="date" id="toDate" />
-      <input type="text" id="search" placeholder="Search (ID, flat, issue, remark, user...)" style="min-width:260px" />
-      <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px" /></label>
-      <button id="applyBtn" class="btn primary">Apply</button><button id="resetBtn" class="btn">Reset</button>
-    </section>
+<header>
+  <div class="brand">
+    <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo"/>
+    <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
   </div>
-
-  <div id="netError" class="banner error" style="display:none">Network error while fetching data.</div>
-  <div id="infoMsg" class="banner info" style="display:none">Showing cached data.</div>
-
-  <div class="tablewrap">
-    <table id="grid">
-      <thead>
-        <tr>
-          <th class="sortable" data-key="Tracking ID">Tracking ID</th>
-          <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
-          <th class="sortable" data-key="Tower">Tower</th>
-          <th class="sortable" data-key="Flat">Flat</th>
-          <th class="sortable" data-key="Issue">Issue</th>
-          <th class="sortable" data-key="Description">Description</th>
-          <th>Media</th>
-          <th class="sortable" data-key="Status">Status</th>
-          <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
-          <th class="sortable" data-key="User ID">User ID</th>
-          <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
-          <th class="sortable" data-key="__computed_time">Time Taken</th>
-          <th class="sortable" data-key="Feedback Rating">Feedback</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div class="pagination">
-      <button class="btn" id="prevPage">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button class="btn" id="nextPage">Next</button>
-      <div class="spacer"></div><span id="rowCount" class="muted"></span>
-    </div>
+  <div class="toolbar">
+    <label class="switch"><span>Timezone:</span>
+      <select id="tz"><option value="local">Local</option><option value="utc">UTC</option></select>
+    </label>
+    <label class="switch"><span>Auto-refresh</span>
+      <input id="auto" type="checkbox" checked/><span class="muted">60s</span>
+    </label>
+    <button id="dark" class="btn">Dark mode</button>
+    <button id="exportCsv" class="btn">Export CSV</button>
+    <button id="logout" class="btn danger" style="display:inline-flex;align-items:center;gap:8px">
+      <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
+    </button>
   </div>
+</header>
 
-  <div id="lightbox"><img id="lightbox-img" src="" alt="preview" /></div>
+<div id="controls" class="sticky-controls">
+  <section class="kpis">
+    <div class="card total"><div class="label">Total</div><div id="kTotal" class="value">0</div></div>
+    <div class="card open"><div class="label">Open</div><div id="kOpen" class="value">0</div></div>
+    <div class="card progress"><div class="label">In Progress</div><div id="kProg" class="value">0</div></div>
+    <div class="card resolved"><div class="label">Resolved</div><div id="kRes" class="value">0</div></div>
+    <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kAvg" class="value">0m</div></div>
+    <div class="card avgrating"><div class="label">Avg Rating</div><div id="kRate" class="value">0</div></div>
+  </section>
+
+  <section class="filters">
+    <select id="fTower"><option value="">All Towers</option></select>
+    <select id="fStatus"><option value="">All Status</option><option>Open</option><option value="InProgress">In Progress</option><option>Resolved</option></select>
+    <input id="fFrom" type="date"><input id="fTo" type="date">
+    <input id="fQ" type="text" placeholder="Search (ID, flat, issue, remark, user…)" style="min-width:260px">
+    <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px"></label>
+    <button id="apply" class="btn primary">Apply</button><button id="reset" class="btn">Reset</button>
+  </section>
+</div>
+
+<div id="netErr" class="banner error" style="display:none">Network error while fetching data.</div>
+<div id="info" class="banner info" style="display:none">Showing cached data.</div>
+
+<div class="tablewrap">
+  <table id="grid">
+    <thead>
+      <tr>
+        <th class="sortable" data-key="Tracking ID">Tracking ID</th>
+        <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
+        <th class="sortable" data-key="Tower">Tower</th>
+        <th class="sortable" data-key="Flat">Flat</th>
+        <th class="sortable" data-key="Issue">Issue</th>
+        <th class="sortable" data-key="Description">Description</th>
+        <th>Media</th>
+        <th class="sortable" data-key="Status">Status</th>
+        <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
+        <th class="sortable" data-key="User ID">User ID</th>
+        <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
+        <th class="sortable" data-key="__computed_time">Time Taken</th>
+        <th class="sortable" data-key="Feedback Rating">Feedback</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div class="pagination">
+    <button id="prev" class="btn">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button id="next" class="btn">Next</button>
+    <div class="spacer"></div><span id="rowCount" class="muted"></span>
+  </div>
+</div>
+
+<div id="lightbox" onclick="this.style.display='none'"><img id="lightImg" alt=""></div>
 
 <script>
-/* ===== helpers ===== */
-const $ = (id)=>document.getElementById(id);
-function fmtDate(d,tz){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tz==="utc"?s+" UTC":s; }
-function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
-function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
-function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
-function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
+  // ===== Helpers =====
+  const $ = sel => document.querySelector(sel);
+  const fmtDate = (d, tz) => {
+    if(!d) return "";
+    const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz==="utc"?"UTC":undefined};
+    const s=new Intl.DateTimeFormat(undefined,o).format(d);
+    return tz==="utc"?s+" UTC":s;
+  };
+  const parseDate = s => { if(!s) return null; const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
+  const eod = v => { const d=new Date(v); d.setHours(23,59,59,999); return d; }
+  const msHuman = ms => { if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60)return `${m}m`; const h=Math.floor(m/60),r=m%60; if(h<24)return `${h}h ${r}m`; const d=Math.floor(h/24),rh=h%24; return `${d}d ${rh}h ${r}m`; };
+  const esc = s => String(s||"").replace(/"/g,"&quot;");
 
-/* lightbox */
-$("lightbox").addEventListener("click", ()=>{ $("lightbox").style.display="none"; });
-function openLightbox(url){ $("lightbox-img").src=url; $("lightbox").style.display="flex"; }
-function renderMediaCell(url){
-  if(!url) return "<span class='muted'>No media</span>";
-  const esc=s=>String(s).replace(/"/g,"&quot;");
-  if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" alt="media" onclick="openLightbox('${esc(url)}')" /></div>`;
-  if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls><source src="${esc(url)}"></video></div>`;
-  if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`;
-  return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`;
-}
+  function openLightbox(url){ $("#lightImg").src=url; $("#lightbox").style.display="flex"; }
+  function setHeights(){ document.documentElement.style.setProperty("--header-h", document.querySelector("header").offsetHeight+"px"); document.documentElement.style.setProperty("--controls-h", $("#controls").offsetHeight+"px"); }
+  addEventListener("resize", setHeights);
 
-/* API wrapper: tolerant to non-JSON bodies (GAS sometimes returns HTML) */
-async function api(path, opts){
-  const res = await fetch(path, { credentials:"same-origin", cache:"no-store", ...(opts||{}) });
-  if (res.status === 401) { location.href="/login"; return; }
-  const clone = res.clone();
-  try { return await clone.json(); }
-  catch { return { ok: res.ok, status: res.status, text: await res.text() }; }
-}
+  // ===== State =====
+  const S = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, size:10, tz:"local", isAdmin:false, timer:null, lastOk:true };
 
-/* ===== app state ===== */
-const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
-
-/* sticky heights (for nice shadows) */
-function setStickyHeights(){
-  const h=document.querySelector('header'); const c=$('controls');
-  if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px');
-  if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px');
-}
-addEventListener('resize', setStickyHeights);
-
-/* logout with animation */
-function setLogoutLoading(on){ const b=$('logoutBtn'), s=$('logoutSpin'), l=$('logoutLabel'); b.disabled=!!on; if(s) s.style.display=on?'inline-block':'none'; if(l) l.textContent=on?'Logging out…':'Logout'; }
-async function handleLogout(){
-  setLogoutLoading(true);
-  const r = await api("/api?mode=api&op=logout");
-  setLogoutLoading(false);
-  if(!(r && r.ok)){ alert("Logout failed: " + (r?.error||r?.text||"")); return; }
-  location.href="/login";
-}
-
-/* ===== data ===== */
-function normalizeRows(rows){
-  return rows.map(r=>{
-    const raised = parseDateSafe(r["Date and Time Raised"]);
-    const resolved = parseDateSafe(r["Date and Time Resolved"]);
-    let ms = null;
-    if(raised && resolved) ms = Math.max(0, resolved - raised);
-    if(ms==null && r["Time Taken"]){
-      const m = String(r["Time Taken"]).match(/(\d+)\s*m/);
-      if(m) ms = parseInt(m[1],10)*60000;
-    }
-    return { ...r, __raised: raised, __resolved: resolved, __computed_time: ms };
-  });
-}
-
-function populateTowerFilter(data){
-  const sel = $("towerFilter");
-  const existing = new Set([...sel.options].map(o=>o.value));
-  [...new Set(data.map(d=>d.Tower).filter(Boolean))].sort().forEach(v=>{
-    if(!existing.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
-  });
-}
-
-async function fetchData(){
-  try{
-    const r = await api("/api?mode=data");
-    if(!(r && (Array.isArray(r) || r.ok))) throw new Error("bad_response");
-    const rows = Array.isArray(r) ? r : (r.data||[]);
-    state.lastFetchOk = true;
-    $("netError").style.display = "none";
-    $("infoMsg").style.display = "none";
-    state.all = normalizeRows(rows);
-    populateTowerFilter(state.all);
-    applyFilters();
-    setStickyHeights();
-  }catch(err){
-    state.lastFetchOk = false;
-    $("netError").style.display = "block";
-    if(state.all.length){ $("infoMsg").style.display = "block"; render(); }
+  // ===== Session =====
+  async function getSession(){
+    const r = await fetch("/api?mode=api&op=sessionInfo", { credentials:"include" });
+    const j = await r.json();
+    S.isAdmin = !!(j && j.info && String(j.info.role).toLowerCase()==="admin");
   }
-}
-
-/* ===== filters & render ===== */
-function applyFilters(){
-  const tower = $("towerFilter").value;
-  const status = $("statusFilter").value;
-  const from = $("fromDate").value ? new Date($("fromDate").value) : null;
-  const to = $("toDate").value ? endOfDay($("toDate").value) : null;
-  const q = $("search").value.trim().toLowerCase();
-
-  state.filtered = state.all.filter(r=>{
-    if(tower && r.Tower !== tower) return false;
-    if(status && r.Status !== status) return false;
-    if(from && r.__raised && r.__raised < from) return false;
-    if(to && r.__raised && r.__raised > to) return false;
-    if(q){
-      const blob = [r["Tracking ID"], r["Tower"], r["Flat"], r["Issue"], r["Description"], r["Redressal Remark"], r["Status"], r["User ID"], r["Feedback Rating"]]
-        .map(x=>String(x||"").toLowerCase()).join(" ");
-      if(!blob.includes(q)) return false;
+  function setLogoutLoading(on){ $("#logout").disabled=!!on; $("#logoutSpin").style.display=on?'inline-block':'none'; $("#logoutLabel").textContent=on?'Logging out…':'Logout'; }
+  async function doLogout(){
+    try{
+      setLogoutLoading(true);
+      await fetch("/api?mode=api&op=logout", { credentials:"include" });
+      location.href="/login";
+    }catch(e){
+      alert("Logout failed: " + (e?.message||e));
+      setLogoutLoading(false);
     }
-    return true;
-  });
-  state.page = 1;
-  render();
-}
+  }
 
-function resetFilters(){
-  $("towerFilter").value = "";
-  $("statusFilter").value = "";
-  $("fromDate").value = "";
-  $("toDate").value = "";
-  $("search").value = "";
-  state.page = 1;
-  state.filtered = state.all.slice();
-  render();
-}
+  // ===== Data =====
+  function normalize(rows){
+    return rows.map(r=>{
+      const raised=parseDate(r["Date and Time Raised"]);
+      const resolved=parseDate(r["Date and Time Resolved"]);
+      let ms=null;
+      if(raised && resolved) ms=Math.max(0, resolved - raised);
+      if(ms==null && r["Time Taken"]){
+        const m=String(r["Time Taken"]).match(/(\d+)\s*m/); if(m) ms=parseInt(m[1],10)*60000;
+      }
+      return { ...r, __raised:raised, __resolved:resolved, __computed_time:ms };
+    });
+  }
 
-function render(){
-  const {key, dir} = state.sort;
-  const data = state.filtered.slice().sort((a,b)=>{
-    const av = key==="__computed_time" ? a.__computed_time : (key==="Date and Time Raised" ? a.__raised : (key==="Date and Time Resolved" ? a.__resolved : a[key]));
-    const bv = key==="__computed_time" ? b.__computed_time : (key==="Date and Time Raised" ? b.__raised : (key==="Date and Time Resolved" ? b.__resolved : b[key]));
-    const aa = av==null ? "" : av, bb = bv==null ? "" : bv;
-    if(aa<bb) return dir==="asc"?-1:1; if(aa>bb) return dir==="asc"?1:-1; return 0;
-  });
+  async function fetchData(){
+    try{
+      const r = await fetch("/api?mode=data", { cache:"no-store", credentials:"include" });
+      if(!r.ok) throw new Error(r.statusText);
+      const data = await r.json();
+      S.lastOk = true; $("#netErr").style.display="none"; $("#info").style.display="none";
+      S.all = normalize(data);
+      populateTower(S.all);
+      applyFilters();
+      setHeights();
+    }catch(e){
+      $("#netErr").style.display="block";
+      if(S.all.length){ $("#info").style.display="block"; render(); }
+      S.lastOk = false;
+    }
+  }
 
-  const start = (state.page-1) * state.pageSize;
-  const slice = data.slice(start, start + state.pageSize);
+  function populateTower(data){
+    const sel = $("#fTower"); const have = new Set([...sel.options].map(o=>o.value));
+    [...new Set(data.map(x=>x.Tower).filter(Boolean))].sort().forEach(v=>{
+      if(!have.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
+    });
+  }
 
-  const total = state.filtered.length;
-  const open = state.filtered.filter(x=>x.Status==="Open").length;
-  const progress = state.filtered.filter(x=>x.Status==="InProgress").length;
-  const resolvedRows = state.filtered.filter(x=>x.Status==="Resolved");
-  const resolved = resolvedRows.length;
-  const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
-  const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
-  const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
+  // ===== Filters / Render =====
+  function applyFilters(){
+    const tower = $("#fTower").value;
+    const status = $("#fStatus").value;
+    const from = $("#fFrom").value ? new Date($("#fFrom").value) : null;
+    const to = $("#fTo").value ? eod($("#fTo").value) : null;
+    const q = $("#fQ").value.trim().toLowerCase();
 
-  $("kpiTotal").textContent = total;
-  $("kpiOpen").textContent = open;
-  $("kpiProgress").textContent = progress;
-  $("kpiResolved").textContent = resolved;
-  $("kpiAvgTime").textContent = msToHuman(avgMs);
-  $("kpiAvgRating").textContent = avgRating;
+    S.filtered = S.all.filter(r=>{
+      if(tower && r.Tower !== tower) return false;
+      if(status && r.Status !== status) return false;
+      if(from && r.__raised && r.__raised < from) return false;
+      if(to && r.__raised && r.__raised > to) return false;
+      if(q){
+        const blob = [r["Tracking ID"],r["Tower"],r["Flat"],r["Issue"],r["Description"],r["Redressal Remark"],r["Status"],r["User ID"],r["Feedback Rating"]]
+          .map(x=>String(x||"").toLowerCase()).join(" ");
+        if(!blob.includes(q)) return false;
+      }
+      return true;
+    });
+    S.page = 1;
+    render();
+  }
 
-  const tbody = $("#grid tbody");
-  tbody.innerHTML = "";
+  function resetFilters(){
+    $("#fTower").value=""; $("#fStatus").value=""; $("#fFrom").value=""; $("#fTo").value=""; $("#fQ").value=""; S.page=1; S.filtered=S.all.slice(); render();
+  }
 
-  slice.forEach(r=>{
-    const tr = document.createElement("tr");
-    const raisedStr = fmtDate(r.__raised, state.tz);
-    const resolvedStr = fmtDate(r.__resolved, state.tz);
-    const timeStr = msToHuman(r.__computed_time);
+  function render(){
+    const {key,dir} = S.sort;
+    const data = S.filtered.slice().sort((a,b)=>{
+      const av = key==="__computed_time" ? a.__computed_time : (key==="Date and Time Raised"?a.__raised:(key==="Date and Time Resolved"?a.__resolved:a[key]));
+      const bv = key==="__computed_time" ? b.__computed_time : (key==="Date and Time Raised"?b.__raised:(key==="Date and Time Resolved"?b.__resolved:b[key]));
+      const aa = av==null?"":av, bb = bv==null?"":bv;
+      if(aa<bb) return dir==="asc"?-1:1; if(aa>bb) return dir==="asc"?1:-1; return 0;
+    });
 
-    tr.innerHTML = `
-      <td><span class="muted" style="border-bottom:1px dashed var(--muted); cursor:copy" title="Click to copy" onclick="navigator.clipboard.writeText('${String(r["Tracking ID"]||"")}')">${r["Tracking ID"]||""}</span></td>
-      <td>${raisedStr}</td>
-      <td>${r["Tower"]||""}</td>
-      <td>${r["Flat"]||""}</td>
-      <td>${r["Issue"]||""}</td>
-      <td>${r["Description"]||""}</td>
-      <td>${renderMediaCell(r["Media URL"])}</td>
+    const start = (S.page-1)*S.size;
+    const slice = data.slice(start, start+S.size);
 
-      <td>
-        ${
-          state.isAdmin
-            ? `<select id="st_${r["Tracking ID"]}" class="edit-status">
-                 <option value="Open"${r["Status"]==="Open"?" selected":""}>Open</option>
-                 <option value="InProgress"${r["Status"]==="InProgress"?" selected":""}>In Progress</option>
-                 <option value="Resolved"${r["Status"]==="Resolved"?" selected":""}>Resolved</option>
-               </select>`
-            : `<span class="badge ${r["Status"]||""}">${r["Status"]||""}</span>`
-        }
-      </td>
+    // KPIs
+    $("#kTotal").textContent = S.filtered.length;
+    $("#kOpen").textContent = S.filtered.filter(x=>x.Status==="Open").length;
+    $("#kProg").textContent = S.filtered.filter(x=>x.Status==="InProgress").length;
+    const resolvedRows = S.filtered.filter(x=>x.Status==="Resolved");
+    $("#kRes").textContent = resolvedRows.length;
+    const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
+    const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
+    $("#kAvg").textContent = msHuman(avgMs);
+    $("#kRate").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
 
-      <td>
-        ${
-          state.isAdmin
-            ? `<div class="cell-actions">
-                 <input id="rk_${r["Tracking ID"]}" class="edit-remark" value="${(r["Redressal Remark"]||"").replace(/"/g,'&quot;')}" placeholder="Remark" style="min-width:180px;max-width:360px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card)" />
-                 <button id="sv_${r["Tracking ID"]}" class="btn small">Save</button>
-               </div>`
-            : `${r["Redressal Remark"]||""}`
-        }
-      </td>
+    const tbody = $("#grid tbody");
+    tbody.innerHTML = "";
+    slice.forEach(r=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="muted" style="border-bottom:1px dashed var(--muted);cursor:copy" title="Click to copy"
+              onclick="navigator.clipboard.writeText('${esc(r["Tracking ID"])}')">${r["Tracking ID"]||""}</span></td>
+        <td>${fmtDate(r.__raised, S.tz)}</td>
+        <td>${r.Tower||""}</td>
+        <td>${r.Flat||""}</td>
+        <td>${r.Issue||""}</td>
+        <td>${r.Description||""}</td>
+        <td>${renderMedia(r["Media URL"])}</td>
+        <td>${
+          S.isAdmin
+          ? `<select class="st" data-id="${r["Tracking ID"]}">
+               <option ${r.Status==="Open"?"selected":""}>Open</option>
+               <option value="InProgress" ${r.Status==="InProgress"?"selected":""}>In Progress</option>
+               <option ${r.Status==="Resolved"?"selected":""}>Resolved</option>
+             </select>`
+          : `<span class="badge ${r.Status||""}">${r.Status||""}</span>`
+        }</td>
+        <td>${
+          S.isAdmin
+          ? `<div style="display:flex;gap:6px;align-items:center">
+               <div class="edit-remark" contenteditable="true" data-id="${r["Tracking ID"]}">${(r["Redressal Remark"]||"").replace(/</g,"&lt;")}</div>
+               <button class="btn small save" data-id="${r["Tracking ID"]}">Save</button>
+             </div>`
+          : `${r["Redressal Remark"]||""}`
+        }</td>
+        <td>${r["User ID"]||""}</td>
+        <td>${fmtDate(r.__resolved, S.tz)}</td>
+        <td>${msHuman(r.__computed_time)}</td>
+        <td>${r["Feedback Rating"]||""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
 
-      <td>${r["User ID"]||""}</td>
-      <td>${resolvedStr}</td>
-      <td>${timeStr}</td>
-      <td>${r["Feedback Rating"]||""}</td>
-    `;
-    tbody.appendChild(tr);
+    const max = Math.max(1, Math.ceil(data.length / S.size));
+    $("#pageInfo").textContent = `Page ${S.page} / ${max}`;
+    $("#rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
 
-    if (state.isAdmin) {
-      // handlers per row
-      $("sv_"+r["Tracking ID"])?.addEventListener("click", ()=>saveRow(String(r["Tracking ID"])));
-      $("st_"+r["Tracking ID"])?.addEventListener("change", ()=>saveRow(String(r["Tracking ID"])));
-      $("rk_"+r["Tracking ID"])?.addEventListener("keydown", (e)=>{
-        if((e.ctrlKey||e.metaKey) && e.key==="Enter"){ e.preventDefault(); saveRow(String(r["Tracking ID"])); }
+    // Admin hooks
+    if (S.isAdmin) {
+      tbody.querySelectorAll("select.st").forEach(sel=>{
+        sel.addEventListener("change", async ()=>{
+          const id = sel.dataset.id, val = sel.value;
+          sel.disabled = true;
+          try {
+            const r = await fetch("/api?mode=api&op=update", {
+              method:"POST",
+              headers:{ "Content-Type":"application/json" },
+              credentials:"include",
+              body: JSON.stringify({ id, field:"Status", value:val })
+            });
+            const j = await r.json();
+            if(!j.success) throw new Error(j.message||"Update failed");
+            await fetchData(); // refresh stamps & KPIs
+          } catch(e) {
+            alert(e.message||e);
+          } finally {
+            sel.disabled = false;
+          }
+        });
+      });
+
+      tbody.querySelectorAll("button.save").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.dataset.id;
+          const box = tbody.querySelector(`.edit-remark[data-id="${id}"]`);
+          const value = (box?.textContent||"").trim();
+          btn.disabled = true; const old = btn.textContent; btn.textContent = "Saving…";
+          try{
+            const r = await fetch("/api?mode=api&op=update", {
+              method:"POST",
+              headers:{ "Content-Type":"application/json" },
+              credentials:"include",
+              body: JSON.stringify({ id, field:"Redressal Remark", value })
+            });
+            const j = await r.json();
+            if(!j.success) throw new Error(j.message||"Update failed");
+            // brief "Saved" animation
+            btn.textContent = "Saved"; setTimeout(()=>btn.textContent=old, 900);
+          }catch(e){
+            alert(e.message||e); btn.textContent = old;
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      tbody.querySelectorAll(".edit-remark").forEach(div=>{
+        div.addEventListener("keydown", e=>{
+          if((e.ctrlKey||e.metaKey) && e.key==="Enter"){
+            const id = div.dataset.id;
+            const b = tbody.querySelector(`button.save[data-id="${id}"]`);
+            if(b) b.click();
+            e.preventDefault();
+          }
+        });
       });
     }
-  });
-
-  document.querySelectorAll("th.sortable").forEach(th=>{
-    th.style.textDecoration = (th.dataset.key===state.sort.key) ? "underline" : "none";
-  });
-
-  const maxPage = Math.max(1, Math.ceil(data.length / state.pageSize));
-  $("pageInfo").textContent = `Page ${state.page} / ${maxPage}`;
-  $("rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
-}
-
-/* save (status/remark) with animated button */
-async function saveRow(id){
-  const btn = $("sv_"+id);
-  const st = $("st_"+id)?.value || "";
-  const rk = $("rk_"+id)?.value?.trim() || "";
-  if(btn){ btn.disabled = true; btn.classList.add("saving"); btn.innerHTML = '<span class="spinner"></span>Saving…'; }
-  try{
-    const url = `/api?mode=update&op=save&id=${encodeURIComponent(id)}&status=${encodeURIComponent(st)}&remark=${encodeURIComponent(rk)}`;
-    const r = await api(url);
-    if(!(r && (r.ok===true || r.success===true))) throw new Error(r?.error || `HTTP ${r?.status||""}`);
-    if(btn){ btn.textContent = "Saved"; setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; btn.classList.remove("saving"); }, 900); }
-    // refresh KPIs + computed fields
-    fetchData();
-  }catch(e){
-    alert("Save failed: " + (e.message || "error"));
-    if(btn){ btn.textContent="Save"; btn.disabled=false; btn.classList.remove("saving"); }
   }
-}
 
-/* export CSV of current filter */
-function exportCSV(){
-  const rows = state.filtered.length ? state.filtered : state.all;
-  if(!rows.length){ alert("No data to export."); return; }
-  const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
-  const csv = [hdr.join(",")];
-  const q = v=>`"${String(v||"").replace(/"/g,'""')}"`;
-  rows.forEach(r=>{
-    const vals = [
-      r["Tracking ID"],
-      r["Date and Time Raised"] || r["Date & Time Raised"] || "",
-      r["Tower"], r["Flat"], r["Issue"], r["Description"],
-      r["Media URL"], r["Status"], r["Redressal Remark"], r["User ID"],
-      r["Date and Time Resolved"] || r["Date & Time Resolved"] || "",
-      r["Time Taken"], r["Feedback Rating"]
-    ].map(q);
-    csv.push(vals.join(","));
-  });
-  const blob = new Blob([csv.join("\n")], {type:"text/csv;charset=utf-8"});
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "helpdesk.csv"; a.click();
-}
+  function renderMedia(url){
+    if(!url) return "<span class='muted'>No media</span>";
+    if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" onclick="openLightbox('${esc(url)}')"></div>`;
+    if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls style="width:140px"><source src="${esc(url)}"></video></div>`;
+    if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`;
+    return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`;
+  }
 
-/* ===== init ===== */
-async function init(){
-  $("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
-  $("export").addEventListener("click", exportCSV);
-  $("applyBtn").addEventListener("click", applyFilters);
-  $("resetBtn").addEventListener("click", resetFilters);
-  $("prevPage").addEventListener("click", ()=>{ if(state.page>1){ state.page--; render(); }});
-  $("nextPage").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(state.filtered.length/state.pageSize)); if(state.page<max){ state.page++; render(); }});
-  $("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
-  $("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
-  $("search").addEventListener("input", debounce(applyFilters, 250));
-  $("autoRefresh").addEventListener("change", ()=>{});
-  $("logoutBtn").addEventListener("click", handleLogout);
-
-  // role
-  const info = await api("/api?mode=api&op=sessionInfo");
-  state.isAdmin = !!(info && info.info && info.info.role === "admin");
-
-  // data + timer
-  await fetchData();
-  state.timer = setInterval(()=>{ if($("autoRefresh").checked) fetchData(); }, 60000);
-
-  // sortable headers
-  document.querySelectorAll("th.sortable").forEach(th=>{
-    th.addEventListener("click", ()=>{
-      const key = th.dataset.key;
-      if(state.sort.key === key){ state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc"; }
-      else { state.sort.key = key; state.sort.dir = "asc"; }
-      render();
+  // ===== CSV =====
+  function exportCSV(){
+    const rows = S.filtered.length ? S.filtered : S.all;
+    const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
+    const csv = [hdr.join(",")];
+    rows.forEach(r=>{
+      const vals = [
+        r["Tracking ID"]||"", fmtDate(r.__raised,S.tz), r.Tower||"", r.Flat||"", r.Issue||"",
+        (r.Description||"").replace(/"/g,'""'), r["Media URL"]||"", r.Status||"",
+        (r["Redressal Remark"]||"").replace(/"/g,'""'), r["User ID"]||"",
+        fmtDate(r.__resolved,S.tz), msHuman(r.__computed_time), r["Feedback Rating"]||""
+      ].map(v=>`"${String(v)}"`);
+      csv.push(vals.join(","));
     });
-  });
+    const blob = new Blob([csv.join("\n")], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="helpdesk.csv"; a.click();
+  }
 
-  setStickyHeights();
-}
+  // ===== Events / Init =====
+  function attachSort(){
+    document.querySelectorAll("th.sortable").forEach(th=>{
+      th.addEventListener("click", ()=>{
+        const k = th.dataset.key;
+        if(S.sort.key===k){ S.sort.dir = S.sort.dir==="asc"?"desc":"asc"; }
+        else { S.sort.key=k; S.sort.dir="asc"; }
+        render();
+      });
+    });
+  }
 
-window.onload = init;
+  (async function init(){
+    $("#dark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
+    $("#exportCsv").addEventListener("click", exportCSV);
+    $("#apply").addEventListener("click", applyFilters);
+    $("#reset").addEventListener("click", resetFilters);
+    $("#prev").addEventListener("click", ()=>{ if(S.page>1){ S.page--; render(); }});
+    $("#next").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(S.filtered.length/S.size)); if(S.page<max){ S.page++; render(); }});
+    $("#pageSize").addEventListener("change", e=>{ S.size=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); S.page=1; render(); });
+    $("#tz").addEventListener("change", e=>{ S.tz=e.target.value; render(); });
+    $("#fQ").addEventListener("input", ((fn,ms)=>{let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}})(applyFilters,250));
+    $("#logout").addEventListener("click", doLogout);
+
+    attachSort();
+    setHeights();
+
+    await getSession();
+    await fetchData();
+    S.timer = setInterval(()=>{ if($("#auto").checked) fetchData(); }, 60000);
+  })();
 </script>
 </body>
 </html>
