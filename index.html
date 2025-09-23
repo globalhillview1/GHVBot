@@ -8,13 +8,14 @@
   <style>
     :root{
       --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280; --text:#0f172a;
-      --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed; --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
+      --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed;
+      --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
       --border:#e5e7eb; --hover:#f1f5f9;
-      --header-h: 72px; --controls-h: 0px;
+      --header-h:72px; --controls-h:0px;
     }
     .dark{ --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb; --border:#1f2937; --hover:#0f172a; }
     *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans"; margin:0; color:var(--text); background:var(--bg)}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";background:var(--bg);color:var(--text)}
     header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
     .brand{display:flex;align-items:center;gap:10px}
     .brand img{height:32px;width:auto;border-radius:6px}
@@ -31,44 +32,33 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
     .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
     .card .value{font-size:20px;font-weight:800;margin-top:6px}
-    .card.total{border-left:6px solid var(--green)}
-    .card.open{border-left:6px solid var(--gray)}
-    .card.progress{border-left:6px solid var(--amber)}
-    .card.resolved{border-left:6px solid var(--blue)}
-    .card.avgtime{border-left:6px solid var(--cyan)}
-    .card.avgrating{border-left:6px solid var(--violet)}
+    .card.total{border-left:6px solid var(--green)}.card.open{border-left:6px solid var(--gray)}.card.progress{border-left:6px solid var(--amber)}.card.resolved{border-left:6px solid var(--blue)}.card.avgtime{border-left:6px solid var(--cyan)}.card.avgrating{border-left:6px solid var(--violet)}
     .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
     table{width:100%;border-collapse:separate;border-spacing:0}
     thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
     tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
     tr:hover td{background:var(--hover)}
-    .sortable{cursor:pointer}
-    .sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
+    .sortable{cursor:pointer}.sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
-    .Open{background:#111827;color:#fff}
-    .InProgress{background:#f59e0b;color:#111}
-    .Resolved{background:#0d6efd;color:#fff}
+    .Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
     .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
     .media video,.media audio{width:140px;height:auto}
     .pagination{display:flex;align-items:center;gap:8px;padding:10px}
-    .spacer{flex:1}
-    .muted{color:var(--muted);font-size:12px}
+    .spacer{flex:1}.muted{color:var(--muted);font-size:12px}
     #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
     #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
     .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
     .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
     .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
-    .edit{width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text)}
-    .cell-actions{display:flex; gap:6px; align-items:center}
-    @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    .edit{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text)}
+    .cell-actions{display:flex;gap:6px;align-items:center}
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Breez Global Hill View logo">
+      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Logo">
       <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
     </div>
     <div class="toolbar">
@@ -78,7 +68,7 @@
       <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
       <button id="toggleDark" class="btn">Dark mode</button>
       <button class="btn" id="exportCsv">Export CSV</button>
-      <button class="btn danger" id="logoutBtn">Logout</button>
+      <button class="btn danger" id="logoutBtn"><span id="logoutLabel">Logout</span></button>
     </div>
   </header>
 
@@ -91,18 +81,10 @@
       <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="value">0m</div></div>
       <div class="card avgrating"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="value">0</div></div>
     </section>
-    <section class="filters">
-      <select id="towerFilter"><option value="">All Towers</option></select>
-      <select id="statusFilter"><option value="">All Status</option><option value="Open">Open</option><option value="InProgress">In Progress</option><option value="Resolved">Resolved</option></select>
-      <input type="date" id="fromDate" /><input type="date" id="toDate" />
-      <input type="text" id="search" placeholder="Search (ID, flat, issue, remark, user...)" style="min-width:260px" />
-      <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px" /></label>
-      <button id="applyBtn" class="btn primary">Apply</button><button id="resetBtn" class="btn">Reset</button>
-    </section>
   </div>
 
   <div id="netError" class="banner error" style="display:none">Network error while fetching data.</div>
-  <div id="infoMsg" class="banner info" style="display:none">Showing cached data.</div>
+  <div id="infoMsg" class="banner info" style="display:none"></div>
 
   <div class="tablewrap">
     <table id="grid">
@@ -115,304 +97,83 @@
           <th class="sortable" data-key="Issue">Issue</th>
           <th class="sortable" data-key="Description">Description</th>
           <th>Media</th>
-          <th class="sortable" data-key="Status">Status</th>
-          <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
+          <th>Status</th>
+          <th>Redressal Remark</th>
           <th class="sortable" data-key="User ID">User ID</th>
-          <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
-          <th class="sortable" data-key="__computed_time">Time Taken</th>
-          <th class="sortable" data-key="Feedback Rating">Feedback</th>
+          <th>Date Resolved</th>
+          <th>Time Taken</th>
+          <th>Feedback</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <div class="pagination">
-      <button class="btn" id="prevPage">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button class="btn" id="nextPage">Next</button>
-      <div class="spacer"></div><span id="rowCount" class="muted"></span>
-    </div>
   </div>
 
-  <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src="" alt="preview" /></div>
-
   <script>
-    const API = "/api"; // Pages Functions base
-function toast(msg, kind="info"){
-  const b = document.getElementById("infoMsg");
-  b.className = "banner " + (kind==="error" ? "error" : "info");
-  b.textContent = msg;
-  b.style.display = "block";
-  setTimeout(()=> b.style.display="none", 2200);
-}
+    const API="/api";
+    function getTok(){try{return localStorage.getItem("session");}catch(e){return null;}}
+    function getRole(){try{return localStorage.getItem("role")||"user";}catch(e){return"user";}}
+    function logoutNow(){
+      document.getElementById("logoutLabel").textContent="Logging out…";
+      setTimeout(()=>{localStorage.clear();location.href="/login";},1000);
+    }
 
-    /* ===== Auth helpers ===== */
-    const getTok = () => { try { return localStorage.getItem('session'); } catch(e){ return null; } };
-    const getRole = () => { try { return localStorage.getItem('role') || 'user'; } catch(e){ return 'user'; } };
-    const setTok  = (t) => { try { t ? localStorage.setItem('session', t) : localStorage.removeItem('session'); } catch(e){} };
-    const logoutNow = () => { setTok(null); localStorage.removeItem('role'); location.href='/login'; };
+    const state={all:[],filtered:[],page:1,pageSize:10,sort:{key:"Date and Time Raised",dir:"desc"},tz:"local",isAdmin:false};
 
-    /* ===== State ===== */
-    const state = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, pageSize:10, tz:"local", timer:null, lastFetchOk:true, isAdmin:false };
-
-    /* ===== Utils ===== */
-    function parseDateSafe(s){ if(!s) return null; if(s instanceof Date) return s; if(typeof s==="number") return new Date(s); const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
-    function fmtDate(d,tzMode){ if(!d) return ""; const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tzMode==="utc"?"UTC":undefined}; const s=new Intl.DateTimeFormat(undefined,o).format(d); return tzMode==="utc"?s+" UTC":s; }
-    function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
-    function msToHuman(ms){ if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60) return `${m}m`; const h=Math.floor(m/60),rem=m%60; if(h<24) return `${h}h ${rem}m`; const days=Math.floor(h/24),rh=h%24; return `${days}d ${rh}h ${rem}m`; }
-    function renderMediaCell(url){ if(!url) return "<span class='muted'>No media</span>"; const esc=s=>String(s).replace(/"/g,"&quot;"); if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" alt="media" onclick="openLightbox('${esc(url)}')" /></div>`; if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls><source src="${esc(url)}"></video></div>`; if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`; return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`; }
-    function openLightbox(url){ document.getElementById("lightbox-img").src=url; document.getElementById("lightbox").style.display="flex"; }
-    function setStickyHeights(){ const h=document.querySelector('header'); const c=document.getElementById('controls'); if(h) document.documentElement.style.setProperty('--header-h',h.offsetHeight+'px'); if(c) document.documentElement.style.setProperty('--controls-h',c.offsetHeight+'px'); }
-    window.addEventListener('resize', setStickyHeights);
-
-    /* ===== Data ===== */
     async function fetchData(){
       try{
-        const r = await fetch("/api?mode=data", { cache:"no-store" });
-        if(!r.ok) throw new Error(r.statusText);
-        const data = await r.json();
-        state.lastFetchOk = true;
-        document.getElementById("netError").style.display = "none";
-        document.getElementById("infoMsg").style.display = "none";
-        state.all = normalizeRows(data);
-        populateTowerFilter(state.all);
-        applyFilters();
-        setStickyHeights();
-      }catch(err){
-        state.lastFetchOk = false;
-        document.getElementById("netError").style.display = "block";
-        if(state.all.length){ document.getElementById("infoMsg").style.display = "block"; render(); }
-      }
-    }
-    function normalizeRows(rows){
-      return rows.map(r=>{
-        const raised = parseDateSafe(r["Date and Time Raised"]);
-        const resolved = parseDateSafe(r["Date and Time Resolved"]);
-        let ms = null;
-        if(raised && resolved) ms = Math.max(0, resolved - raised);
-        if(ms==null && r["Time Taken"]){
-          const m = String(r["Time Taken"]).match(/(\d+)\s*m/);
-          if(m) ms = parseInt(m[1],10)*60000;
-        }
-        return { ...r, __raised: raised, __resolved: resolved, __computed_time: ms };
-      });
-    }
-    function populateTowerFilter(data){
-      const sel = document.getElementById("towerFilter");
-      const existing = new Set([...sel.options].map(o=>o.value));
-      [...new Set(data.map(d=>d.Tower).filter(Boolean))].sort().forEach(v=>{
-        if(!existing.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
-      });
-    }
-    function applyFilters(){
-      const tower = document.getElementById("towerFilter").value;
-      const status = document.getElementById("statusFilter").value;
-      const from = document.getElementById("fromDate").value ? new Date(document.getElementById("fromDate").value) : null;
-      const to = document.getElementById("toDate").value ? endOfDay(document.getElementById("toDate").value) : null;
-      const q = document.getElementById("search").value.trim().toLowerCase();
-
-      state.filtered = state.all.filter(r=>{
-        if(tower && r.Tower !== tower) return false;
-        if(status && r.Status !== status) return false;
-        if(from && r.__raised && r.__raised < from) return false;
-        if(to && r.__raised && r.__raised > to) return false;
-        if(q){
-          const blob = [r["Tracking ID"], r["Tower"], r["Flat"], r["Issue"], r["Description"], r["Redressal Remark"], r["Status"], r["User ID"], r["Feedback Rating"]]
-            .map(x=>String(x||"").toLowerCase()).join(" ");
-          if(!blob.includes(q)) return false;
-        }
-        return true;
-      });
-      state.page = 1;
-      render();
-    }
-    function resetFilters(){
-      document.getElementById("towerFilter").value = "";
-      document.getElementById("statusFilter").value = "";
-      document.getElementById("fromDate").value = "";
-      document.getElementById("toDate").value = "";
-      document.getElementById("search").value = "";
-      state.page = 1;
-      state.filtered = state.all.slice();
-      render();
-    }
-
-    function rowEditor(r){
-      if(!state.isAdmin){
-        return `
-          <td><span class="badge ${r["Status"]||""}">${r["Status"]||""}</span></td>
-          <td>${r["Redressal Remark"]||""}</td>
-        `;
-      }
-      const id = String(r["Tracking ID"]||"");
-      const st = String(r["Status"]||"");
-      const remark = (r["Redressal Remark"]||"").toString().replace(/"/g,'&quot;');
-      return `
-        <td>
-          <select class="edit" id="st-${id}">
-            <option value="Open" ${st==="Open"?"selected":""}>Open</option>
-            <option value="InProgress" ${st==="InProgress"?"selected":""}>In Progress</option>
-            <option value="Resolved" ${st==="Resolved"?"selected":""}>Resolved</option>
-          </select>
-        </td>
-        <td>
-          <div class="cell-actions">
-            <input class="edit" id="rm-${id}" value="${remark}" placeholder="Enter remark">
-            <button class="btn small primary" onclick="saveRow('${id}')">Save</button>
-          </div>
-        </td>
-      `;
+        const r=await fetch(API+"?mode=data",{cache:"no-store"});
+        const data=await r.json();
+        state.all=data.map(r=>({...r,__raised:new Date(r["Date and Time Raised"])}));
+        render();
+      }catch(e){document.getElementById("netError").style.display="block";}
     }
 
     async function saveRow(id){
-      const stEl = document.getElementById(`st-${id}`);
-      const rmEl = document.getElementById(`rm-${id}`);
-      if(!stEl || !rmEl) return;
-      const status = stEl.value;
-      const remark = rmEl.value;
-
-      const btn = stEl.nextElementSibling?.querySelector?.('button') || null;
-      if(btn){ btn.disabled=true; btn.textContent='Saving...'; }
-
+      const st=document.getElementById("st-"+id).value;
+      const rm=document.getElementById("rm-"+id).value;
+      const btn=document.getElementById("btn-"+id);
+      btn.textContent="Saving…";btn.disabled=true;
       try{
-        const res = await fetch('/api?mode=api&op=update', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ id, status, remark })
-        });
-        if(!res.ok){ throw new Error(await res.text()); }
-        const out = await res.json().catch(()=>({ok:true}));
-        if(out && out.ok===false){ throw new Error(out.message||'Save failed'); }
-
-        // Update local copy so UI reflects change immediately
-        const row = state.all.find(x=>String(x["Tracking ID"])===String(id));
-        if(row){
-          row.Status = status;
-          row["Redressal Remark"] = remark;
-          if(status==="Resolved" && !row.__resolved){ row.__resolved = new Date(); row["Date and Time Resolved"] = row.__resolved.toISOString(); }
-          row.__computed_time = row.__raised && row.__resolved ? Math.max(0, row.__resolved - row.__raised) : row.__computed_time;
-        }
-        applyFilters();
-      }catch(e){
-        alert('Save failed: ' + e.message);
-      }finally{
-        if(btn){ btn.disabled=false; btn.textContent='Save'; }
-      }
+        const r=await fetch(API+"?mode=api&op=update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:getTok(),op:"update",id,status:st,remark:rm})});
+        const j=await r.json();
+        if(j&&j.ok){btn.textContent="Saved ✓";setTimeout(()=>{btn.textContent="Save";btn.disabled=false;fetchData();},1000);}
+        else throw new Error(j.error||"Failed");
+      }catch(e){btn.textContent="Failed ✕";setTimeout(()=>{btn.textContent="Save";btn.disabled=false;},1500);}
     }
-    window.saveRow = saveRow; // expose for onclick
+    window.saveRow=saveRow;
 
     function render(){
-      const {key, dir} = state.sort;
-      const data = state.filtered.slice().sort((a,b)=>{
-        const av = key==="__computed_time" ? a.__computed_time : (key==="Date and Time Raised" ? a.__raised : (key==="Date and Time Resolved" ? a.__resolved : a[key]));
-        const bv = key==="__computed_time" ? b.__computed_time : (key==="Date and Time Raised" ? b.__raised : (key==="Date and Time Resolved" ? b.__resolved : b[key]));
-        const aa = av==null ? "" : av, bb = bv==null ? "" : bv;
-        if(aa<bb) return dir==="asc"?-1:1; if(aa>bb) return dir==="asc"?1:-1; return 0;
+      const tbody=document.querySelector("#grid tbody");
+      tbody.innerHTML="";
+      state.all.forEach(r=>{
+        const id=r["Tracking ID"];
+        const admin=getRole()==="admin";
+        tbody.innerHTML+=`
+          <tr>
+            <td>${id}</td>
+            <td>${r["Date and Time Raised"]||""}</td>
+            <td>${r["Tower"]||""}</td>
+            <td>${r["Flat"]||""}</td>
+            <td>${r["Issue"]||""}</td>
+            <td>${r["Description"]||""}</td>
+            <td>${r["Media URL"]?`<a href="${r["Media URL"]}" target="_blank">Media</a>`:""}</td>
+            <td>${admin?`<select id="st-${id}" class="edit"><option>Open</option><option ${r.Status==="InProgress"?"selected":""}>InProgress</option><option ${r.Status==="Resolved"?"selected":""}>Resolved</option></select>`:`<span class="badge">${r.Status||""}</span>`}</td>
+            <td>${admin?`<input id="rm-${id}" class="edit" value="${r["Redressal Remark"]||""}"> <button id="btn-${id}" class="btn small primary" onclick="saveRow('${id}')">Save</button>`:r["Redressal Remark"]||""}</td>
+            <td>${r["User ID"]||""}</td>
+            <td>${r["Date and Time Resolved"]||""}</td>
+            <td>${r["Time Taken"]||""}</td>
+            <td>${r["Feedback Rating"]||""}</td>
+          </tr>`;
       });
-
-      const start = (state.page-1) * state.pageSize;
-      const slice = data.slice(start, start + state.pageSize);
-
-      const total = state.filtered.length;
-      const open = state.filtered.filter(x=>x.Status==="Open").length;
-      const progress = state.filtered.filter(x=>x.Status==="InProgress").length;
-      const resolvedRows = state.filtered.filter(x=>x.Status==="Resolved");
-      const resolved = resolvedRows.length;
-      const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
-      const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
-      const avgRating = ratings.length ? (ratings.reduce((a,b,)=>a+b,0)/ratings.length).toFixed(1) : "0";
-
-      document.getElementById("kpiTotal").textContent = total;
-      document.getElementById("kpiOpen").textContent = open;
-      document.getElementById("kpiProgress").textContent = progress;
-      document.getElementById("kpiResolved").textContent = resolved;
-      document.getElementById("kpiAvgTime").textContent = msToHuman(avgMs);
-      document.getElementById("kpiAvgRating").textContent = avgRating;
-
-      const tbody = document.querySelector("#grid tbody");
-      tbody.innerHTML = "";
-      slice.forEach(r=>{
-        const tr = document.createElement("tr");
-        const raisedStr = fmtDate(r.__raised, state.tz);
-        const resolvedStr = fmtDate(r.__resolved, state.tz);
-        const timeStr = msToHuman(r.__computed_time);
-        tr.innerHTML = `
-          <td><span class="muted" style="border-bottom:1px dashed var(--muted); cursor:copy" title="Click to copy" onclick="navigator.clipboard.writeText('${String(r["Tracking ID"]||"")}')">${r["Tracking ID"]||""}</span></td>
-          <td>${raisedStr}</td>
-          <td>${r["Tower"]||""}</td>
-          <td>${r["Flat"]||""}</td>
-          <td>${r["Issue"]||""}</td>
-          <td>${r["Description"]||""}</td>
-          <td>${renderMediaCell(r["Media URL"])}</td>
-          ${rowEditor(r)}
-          <td>${r["User ID"]||""}</td>
-          <td>${resolvedStr}</td>
-          <td>${timeStr}</td>
-          <td>${r["Feedback Rating"]||""}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.querySelectorAll("th.sortable").forEach(th=>{
-        th.style.textDecoration = (th.dataset.key===state.sort.key) ? "underline" : "none";
-      });
-
-      const maxPage = Math.max(1, Math.ceil(data.length / state.pageSize));
-      document.getElementById("pageInfo").textContent = `Page ${state.page} / ${maxPage}`;
-      document.getElementById("rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
     }
 
-    function exportCSV(){
-      const rows = state.filtered.length ? state.filtered : state.all;
-      const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
-      const csvRows = [hdr.join(",")];
-      rows.forEach(r=>{
-        const raised = fmtDate(r.__raised, state.tz);
-        const resolved = fmtDate(r.__resolved, state.tz);
-        const time = msToHuman(r.__computed_time);
-        const vals = [ r["Tracking ID"]||"", raised, r["Tower"]||"", r["Flat"]||"", r["Issue"]||"", (r["Description"]||"").replace(/"/g,'""'),
-                       r["Media URL"]||"", r["Status"]||"", (r["Redressal Remark"]||"").replace(/"/g,'""'),
-                       r["User ID"]||"", resolved, time, r["Feedback Rating"]||"" ]
-                       .map(v=>`"${String(v)}"`);
-        csvRows.push(vals.join(","));
-      });
-      const blob = new Blob([csvRows.join("\n")], {type:"text/csv;charset=utf-8"});
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "helpdesk.csv"; a.click();
-    }
-
-    function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),ms) } }
-
-    /* ===== Init ===== */
-    async function init(){
-      // Require session
-      if (!getTok()) { location.href = "/login"; return; }
-      state.isAdmin = (getRole()==='admin');
-
-      document.getElementById("toggleDark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
-      document.getElementById("exportCsv").addEventListener("click", exportCSV);
-      document.getElementById("applyBtn").addEventListener("click", applyFilters);
-      document.getElementById("resetBtn").addEventListener("click", resetFilters);
-      document.getElementById("prevPage").addEventListener("click", ()=>{ if(state.page>1){ state.page--; render(); }});
-      document.getElementById("nextPage").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(state.filtered.length/state.pageSize)); if(state.page<max){ state.page++; render(); }});
-      document.getElementById("pageSize").addEventListener("change", e=>{ state.pageSize=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); state.page=1; render(); });
-      document.getElementById("tzSelect").addEventListener("change", e=>{ state.tz=e.target.value; render(); });
-      document.getElementById("search").addEventListener("input", debounce(applyFilters, 250));
-      document.getElementById("logoutBtn").addEventListener("click", logoutNow);
-
-      await fetchData();
-      state.timer = setInterval(()=>{ if(document.getElementById("autoRefresh").checked) fetchData(); }, 60000);
-      setStickyHeights();
-    }
-    window.onload = init;
-
-    // Sorting handlers
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll("th.sortable").forEach(th=>{
-        th.addEventListener("click", ()=>{
-          const key = th.dataset.key;
-          if(state.sort.key === key){ state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc"; }
-          else { state.sort.key = key; state.sort.dir = "asc"; }
-          render();
-        });
-      });
-    });
+    window.onload=async()=>{
+      if(!getTok()){location.href="/login";return;}
+      state.isAdmin=getRole()==="admin";
+      document.getElementById("logoutBtn").onclick=logoutNow;
+      fetchData();
+    };
   </script>
 </body>
 </html>
