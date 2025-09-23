@@ -2,142 +2,80 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Global Hillview, Enviro Helpdesk Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Global Hillview Helpdesk Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM"/>
 <style>
-  :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text)}
-  header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
-  .brand{display:flex;align-items:center;gap:10px}
-  .brand img{height:32px;border-radius:6px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{border:1px solid var(--border);background:var(--card);padding:8px 10px;border-radius:10px;cursor:pointer}
-  .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
-  .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+  body{margin:0;font-family:system-ui;background:#f7f9fc;color:#0f172a}
+  header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+  h1{margin:0;font-size:20px}
+  .btn{padding:8px 12px;border-radius:10px;cursor:pointer;border:1px solid #e5e7eb;background:#fff}
+  .btn.primary{background:#0d6efd;color:#fff;border:none}
+  .btn.danger{background:#ef4444;color:#fff;border:none}
   .spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:-2px}
   @keyframes spin{to{transform:rotate(360deg)}}
   table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
-  th.sortable{cursor:pointer}
-  th.sortable:after{content:" ⇅";color:var(--muted);font-size:12px}
-  .edit-remark{min-width:160px;padding:6px;border:1px solid var(--border);border-radius:8px}
-  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;align-items:center;justify-content:center}
+  th,td{padding:10px;border-bottom:1px solid #e5e7eb}
+  th{background:#fff;position:sticky;top:0}
+  .media img{width:64px;cursor:pointer;border-radius:8px}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99;align-items:center;justify-content:center}
   #lightbox img{max-width:90vw;max-height:90vh;border-radius:12px}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">
-    <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo"/>
-    <h1>Global Hillview, Enviro Helpdesk</h1>
-  </div>
-  <div class="toolbar">
+  <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
+  <div>
     <button id="export" class="btn">Export CSV</button>
-    <button id="logout" class="btn danger"><span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span></button>
+    <button id="logout" class="btn danger"><span id="lbl">Logout</span><span id="spin" class="spinner" style="display:none"></span></button>
   </div>
 </header>
 
-<div style="padding:20px">
+<div style="padding:16px">
   <table id="grid">
-    <thead>
-      <tr>
-        <th>Tracking ID</th><th>Date</th><th>Tower</th><th>Flat</th><th>Issue</th><th>Description</th><th>Media</th><th>Status</th><th>Remark</th><th>User</th>
-      </tr>
-    </thead>
+    <thead><tr><th>ID</th><th>Raised</th><th>Issue</th><th>Status</th><th>Remark</th><th>User</th><th>Media</th></tr></thead>
     <tbody></tbody>
   </table>
 </div>
 
-<div id="lightbox"><img id="lightImg"></div>
+<div id="lightbox" onclick="this.style.display='none'"><img id="lightimg"></div>
 
 <script>
 const $=s=>document.querySelector(s);
-
-async function api(url,opt={}){
-  const r=await fetch(url,{credentials:"include",cache:"no-store",...opt});
-  const ct=r.headers.get("content-type")||"";
-  if(ct.includes("application/json")) return r.json();
-  return { ok:r.ok, status:r.status, text:await r.text() };
+async function api(path,opt){const r=await fetch(path,{credentials:"include",...opt});const ct=r.headers.get("content-type")||"";if(ct.includes("json"))return r.json();return {ok:r.ok,text:await r.text()};}
+async function fetchData(){
+  try{const rows=await api("/api?mode=data");render(rows);}catch(e){alert("Fetch failed "+e);}
 }
-
-async function loadData(){
-  const data=await api("/api?mode=data");
-  if(!Array.isArray(data)){ alert("Bad data"); return; }
-  const tb=$("#grid tbody"); tb.innerHTML="";
-  data.forEach(r=>{
+function render(rows){
+  const tb=$("#grid tbody");tb.innerHTML="";
+  rows.forEach(r=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${r["Tracking ID"]}</td>
-      <td>${r["Date and Time Raised"]||""}</td>
-      <td>${r.Tower||""}</td>
-      <td>${r.Flat||""}</td>
-      <td>${r.Issue||""}</td>
-      <td>${r.Description||""}</td>
-      <td>${mediaCell(r["Media URL"])}</td>
+    tr.innerHTML=`<td>${r["Tracking ID"]}</td><td>${r["Date and Time Raised"]}</td><td>${r.Issue||""}</td>
       <td><select class="st" data-id="${r["Tracking ID"]}">
-        <option${r.Status==="Open"?" selected":""}>Open</option>
-        <option value="InProgress"${r.Status==="InProgress"?" selected":""}>In Progress</option>
-        <option${r.Status==="Resolved"?" selected":""}>Resolved</option>
+        <option ${r.Status==="Open"?"selected":""}>Open</option>
+        <option value="InProgress" ${r.Status==="InProgress"?"selected":""}>In Progress</option>
+        <option ${r.Status==="Resolved"?"selected":""}>Resolved</option>
       </select></td>
-      <td><div style="display:flex;gap:6px;align-items:center">
-        <div class="edit-remark" contenteditable="true" data-id="${r["Tracking ID"]}">${r["Redressal Remark"]||""}</div>
-        <button class="btn save" data-id="${r["Tracking ID"]}">Save</button>
-      </div></td>
+      <td><input class="rk" data-id="${r["Tracking ID"]}" value="${r["Redressal Remark"]||""}"/><button class="save" data-id="${r["Tracking ID"]}">Save</button></td>
       <td>${r["User ID"]||""}</td>
-    `;
+      <td>${r["Media URL"]?`<img src="${r["Media URL"]}" onclick="openLightbox('${r["Media URL"]}')">`:""}</td>`;
     tb.appendChild(tr);
   });
-  attachRowHandlers();
-}
-
-function mediaCell(url){
-  if(!url) return "—";
-  if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<img src="${url}" style="width:64px;cursor:pointer" onclick="openLightbox('${url}')">`;
-  if(/\.(mp4|webm)$/i.test(url)) return `<video controls style="width:120px"><source src="${url}"></video>`;
-  return `<a href="${url}" target="_blank">Open</a>`;
-}
-
-function openLightbox(url){ $("#lightImg").src=url; $("#lightbox").style.display="flex"; }
-$("#lightbox").onclick=()=>$("#lightbox").style.display="none";
-
-function attachRowHandlers(){
-  document.querySelectorAll("select.st").forEach(sel=>{
-    sel.onchange=async()=>{
-      sel.disabled=true;
-      await updateField(sel.dataset.id,"Status",sel.value);
-      sel.disabled=false;
-    };
-  });
-  document.querySelectorAll("button.save").forEach(btn=>{
-    btn.onclick=async()=>{
-      const id=btn.dataset.id;
-      const val=document.querySelector(`.edit-remark[data-id="${id}"]`).textContent.trim();
-      btn.textContent="Saving…";
-      await updateField(id,"Redressal Remark",val);
-      btn.textContent="Save";
-    };
+  tb.querySelectorAll("select.st").forEach(sel=>sel.onchange=()=>update(sel.dataset.id,"Status",sel.value));
+  tb.querySelectorAll("button.save").forEach(btn=>btn.onclick=()=>{
+    const id=btn.dataset.id;const val=tb.querySelector(`input.rk[data-id="${id}"]`).value;
+    update(id,"Redressal Remark",val,btn);
   });
 }
-
-async function updateField(id,field,value){
-  const r=await api("/api?mode=api&op=update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,field,value})});
-  if(!(r&&r.success)){ alert("Update failed: "+(r.message||r.text||"")); }
+async function update(id,field,value,btn){
+  if(btn){btn.disabled=true;btn.textContent="Saving…";}
+  const r=await api("/api?mode=api&op=update",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id,field,value})});
+  if(!r.success){alert("Update failed "+(r.message||r.text||""));}else{if(btn){btn.textContent="Saved";setTimeout(()=>{btn.textContent="Save";btn.disabled=false;},800);}}
 }
-
-$("#logout").onclick=async()=>{
-  $("#logoutLabel").textContent="Logging out…"; $("#logoutSpin").style.display="inline-block";
-  await api("/api?mode=api&op=logout",{method:"POST"});
-  location.href="/login";
-};
-
-$("#export").onclick=()=>{
-  const rows=[...document.querySelectorAll("#grid tbody tr")].map(tr=>[...tr.children].map(td=>td.innerText));
-  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="helpdesk.csv"; a.click();
-};
-
-loadData();
+function openLightbox(url){$("#lightimg").src=url;$("#lightbox").style.display="flex";}
+$("#export").onclick=()=>{const rows=[...$("#grid tbody").rows].map(tr=>[...tr.cells].map(td=>td.innerText));const csv=rows.map(r=>r.join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="helpdesk.csv";a.click();}
+$("#logout").onclick=async()=>{$("#spin").style.display="inline-block";$("#lbl").textContent="Logging out…";await api("/api?mode=api&op=logout");location.href="/login";}
+fetchData();
 </script>
 </body>
 </html>
