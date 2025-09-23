@@ -4,103 +4,88 @@
   <meta charset="UTF-8" />
   <title>Global Hillview, Enviro Helpdesk Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
   <style>
     :root{
-      --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280; --text:#0f172a;
-      --blue:#0d6efd; --green:#22c55e; --amber:#f59e0b; --violet:#7c3aed;
-      --cyan:#06b6d4; --gray:#374151; --danger:#ef4444;
-      --border:#e5e7eb; --hover:#f1f5f9;
-      --header-h:72px; --controls-h:0px;
+      --bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--border:#e5e7eb;
+      --blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--violet:#7c3aed;--danger:#ef4444;--hover:#f1f5f9;
+      --header-h:72px;
     }
-    .dark{ --bg:#0b1220; --card:#121a2a; --muted:#9aa4b2; --text:#e5e7eb; --border:#1f2937; --hover:#0f172a; }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+    header{position:sticky;top:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;background:var(--bg);border-bottom:1px solid var(--border)}
     .brand{display:flex;align-items:center;gap:10px}
-    .brand img{height:32px;width:auto;border-radius:6px}
-    header h1{font-size:20px;margin:0;font-weight:700}
-    .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-    .switch{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+    .brand img{height:32px;width:auto;border-radius:8px}
+    h1{margin:0;font-size:20px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);background:var(--card);border-radius:10px;padding:6px 10px}
     .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
     .btn:hover{background:var(--hover)}
     .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
     .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
     .btn.small{padding:4px 8px;font-size:12px}
-    .sticky-controls{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
-    .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+    .sticky{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:10px 18px 12px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:10px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px}
     .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
-    .card .value{font-size:20px;font-weight:800;margin-top:6px}
-    .card.total{border-left:6px solid var(--green)}.card.open{border-left:6px solid var(--gray)}.card.progress{border-left:6px solid var(--amber)}.card.resolved{border-left:6px solid var(--blue)}.card.avgtime{border-left:6px solid var(--cyan)}.card.avgrating{border-left:6px solid var(--violet)}
-    .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-    .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
+    .card .val{font-weight:800;font-size:20px;margin-top:6px}
+    .c1{border-left:6px solid var(--green)} .c2{border-left:6px solid #111827}
+    .c3{border-left:6px solid var(--amber)} .c4{border-left:6px solid var(--blue)}
+    .c5{border-left:6px solid var(--cyan)} .c6{border-left:6px solid var(--violet)}
+    .err{display:none;margin:10px 18px;padding:10px;border:1px solid #fecaca;background:#fee2e2;color:#7f1d1d;border-radius:12px}
+    .tablewrap{margin:12px 18px;height:calc(100vh - var(--header-h) - 160px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
     table{width:100%;border-collapse:separate;border-spacing:0}
-    thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;text-align:left;padding:10px}
+    thead th{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:10px;font-size:13px;text-align:left}
     tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
     tr:hover td{background:var(--hover)}
-    .sortable{cursor:pointer}.sortable:after{content:" ⇅";color:var(--muted);font-weight:400;font-size:12px}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
     .Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
-    .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
-    .media video,.media audio{width:140px;height:auto}
-    .pagination{display:flex;align-items:center;gap:8px;padding:10px}
-    .spacer{flex:1}.muted{color:var(--muted);font-size:12px}
-    #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
-    #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
-    .banner{display:none;padding:10px 12px;margin:10px 20px;border-radius:12px;border:1px solid var(--border)}
-    .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
-    .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
-    .edit{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text)}
-    .cell-actions{display:flex;gap:6px;align-items:center}
+    .edit{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="Logo">
+      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo" />
       <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
     </div>
     <div class="toolbar">
-      <label class="switch"><span>Timezone:</span>
-        <select id="tzSelect"><option value="local">Local</option><option value="utc">UTC</option></select>
+      <label class="chip">Timezone:
+        <select id="tz"><option value="local">Local</option><option value="utc">UTC</option></select>
       </label>
-      <label class="switch"><span>Auto-refresh</span><input id="autoRefresh" type="checkbox" checked /><span class="muted">60s</span></label>
-      <button id="toggleDark" class="btn">Dark mode</button>
-      <button class="btn" id="exportCsv">Export CSV</button>
-      <button class="btn danger" id="logoutBtn"><span id="logoutLabel">Logout</span></button>
+      <label class="chip">Auto-refresh <input id="ar" type="checkbox" checked /> <span style="color:#6b7280">60s</span></label>
+      <button id="csv" class="btn">Export CSV</button>
+      <button id="logout" class="btn danger"><span id="logoutText">Logout</span></button>
     </div>
   </header>
 
-  <div id="controls" class="sticky-controls">
+  <div class="sticky">
     <section class="kpis">
-      <div class="card total"><div class="label">Total</div><div id="kpiTotal" class="value">0</div></div>
-      <div class="card open"><div class="label">Open</div><div id="kpiOpen" class="value">0</div></div>
-      <div class="card progress"><div class="label">In Progress</div><div id="kpiProgress" class="value">0</div></div>
-      <div class="card resolved"><div class="label">Resolved</div><div id="kpiResolved" class="value">0</div></div>
-      <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="value">0m</div></div>
-      <div class="card avgrating"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="value">0</div></div>
+      <div class="card c1"><div class="label">Total</div><div id="kpiTotal" class="val">0</div></div>
+      <div class="card c2"><div class="label">Open</div><div id="kpiOpen" class="val">0</div></div>
+      <div class="card c3"><div class="label">In Progress</div><div id="kpiProgress" class="val">0</div></div>
+      <div class="card c4"><div class="label">Resolved</div><div id="kpiResolved" class="val">0</div></div>
+      <div class="card c5"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="val">0m</div></div>
+      <div class="card c6"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="val">0</div></div>
     </section>
   </div>
 
-  <div id="netError" class="banner error" style="display:none">Network error while fetching data.</div>
-  <div id="infoMsg" class="banner info" style="display:none"></div>
+  <div id="err" class="err">Network error while fetching data.</div>
 
   <div class="tablewrap">
     <table id="grid">
       <thead>
         <tr>
-          <th class="sortable" data-key="Tracking ID">Tracking ID</th>
-          <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
-          <th class="sortable" data-key="Tower">Tower</th>
-          <th class="sortable" data-key="Flat">Flat</th>
-          <th class="sortable" data-key="Issue">Issue</th>
-          <th class="sortable" data-key="Description">Description</th>
+          <th>Tracking ID</th>
+          <th>Date & Time Raised</th>
+          <th>Tower</th>
+          <th>Flat</th>
+          <th>Issue</th>
+          <th>Description</th>
           <th>Media</th>
           <th>Status</th>
           <th>Redressal Remark</th>
-          <th class="sortable" data-key="User ID">User ID</th>
-          <th>Date Resolved</th>
+          <th>User ID</th>
+          <th>Date & Time Resolved</th>
           <th>Time Taken</th>
           <th>Feedback</th>
         </tr>
@@ -111,69 +96,122 @@
 
   <script>
     const API="/api";
-    function getTok(){try{return localStorage.getItem("session");}catch(e){return null;}}
-    function getRole(){try{return localStorage.getItem("role")||"user";}catch(e){return"user";}}
-    function logoutNow(){
-      document.getElementById("logoutLabel").textContent="Logging out…";
-      setTimeout(()=>{localStorage.clear();location.href="/login";},1000);
-    }
+    const $=(s)=>document.querySelector(s);
 
-    const state={all:[],filtered:[],page:1,pageSize:10,sort:{key:"Date and Time Raised",dir:"desc"},tz:"local",isAdmin:false};
+    // Auth gate
+    function tok(){try{return localStorage.getItem("session");}catch(e){return null}}
+    function role(){try{return localStorage.getItem("role")||"user";}catch(e){return "user"}}
+    if(!tok()){ location.replace("/login"); }
 
-    async function fetchData(){
+    const state={all:[],isAdmin:role()==="admin"};
+
+    // Logout animation
+    $("#logout").onclick=()=>{ $("#logoutText").textContent="Logging out…"; setTimeout(()=>{localStorage.clear(); location.replace("/login");},800); };
+
+    async function load(){
       try{
         const r=await fetch(API+"?mode=data",{cache:"no-store"});
         const data=await r.json();
-        state.all=data.map(r=>({...r,__raised:new Date(r["Date and Time Raised"])}));
+        state.all=data;
         render();
-      }catch(e){document.getElementById("netError").style.display="block";}
+      }catch(e){
+        $("#err").style.display="block";
+      }
     }
 
+    function cellMedia(u){
+      if(!u) return "";
+      return `<a href="${u}" target="_blank" rel="noopener">Media</a>`;
+    }
+
+    function rowHtml(r){
+      const id=r["Tracking ID"];
+      const st=r["Status"]||"Open";
+      const remark=r["Redressal Remark"]||"";
+      const admin=state.isAdmin;
+
+      const statusCell = admin
+        ? `<select id="st-${id}" class="edit">
+             <option ${st==="Open"?"selected":""}>Open</option>
+             <option ${st==="InProgress"?"selected":""}>InProgress</option>
+             <option ${st==="Resolved"?"selected":""}>Resolved</option>
+           </select>`
+        : `<span class="badge ${st.replace(/\s+/g,"")}">${st}</span>`;
+
+      const remarkCell = admin
+        ? `<div style="display:flex;gap:6px;align-items:center">
+             <input id="rm-${id}" class="edit" value="${remark.replace(/"/g,"&quot;")}" />
+             <button id="sv-${id}" class="btn small primary" onclick="saveRow('${id}')">Save</button>
+           </div>`
+        : (remark||"");
+
+      return `
+        <tr>
+          <td>${id}</td>
+          <td>${r["Date and Time Raised"]||""}</td>
+          <td>${r["Tower"]||""}</td>
+          <td>${r["Flat"]||""}</td>
+          <td>${r["Issue"]||""}</td>
+          <td>${r["Description"]||""}</td>
+          <td>${cellMedia(r["Media URL"])}</td>
+          <td>${statusCell}</td>
+          <td>${remarkCell}</td>
+          <td>${r["User ID"]||""}</td>
+          <td>${r["Date and Time Resolved"]||""}</td>
+          <td>${r["Time Taken"]||""}</td>
+          <td>${r["Feedback Rating"]||""}</td>
+        </tr>`;
+    }
+
+    function render(){
+      const tb=$("#grid tbody");
+      tb.innerHTML = state.all.map(rowHtml).join("");
+      // KPIs
+      const total=state.all.length;
+      const open=state.all.filter(x=>x.Status==="Open").length;
+      const inprog=state.all.filter(x=>x.Status==="InProgress").length;
+      const resolved=state.all.filter(x=>x.Status==="Resolved").length;
+      $("#kpiTotal").textContent=total;
+      $("#kpiOpen").textContent=open;
+      $("#kpiProgress").textContent=inprog;
+      $("#kpiResolved").textContent=resolved;
+      // (Avg time / rating are sample placeholders unless your GAS returns them precomputed)
+      $("#kpiAvgTime").textContent="0m";
+      const ratings=state.all.map(x=>Number(x["Feedback Rating"]||0)).filter(n=>!Number.isNaN(n));
+      $("#kpiAvgRating").textContent=ratings.length? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
+    }
+
+    // Save with animation
     async function saveRow(id){
-      const st=document.getElementById("st-"+id).value;
-      const rm=document.getElementById("rm-"+id).value;
-      const btn=document.getElementById("btn-"+id);
-      btn.textContent="Saving…";btn.disabled=true;
+      const stEl=$("#st-"+id), rmEl=$("#rm-"+id), btn=$("#sv-"+id);
+      const status=stEl?.value ?? "";
+      const remark=rmEl?.value ?? "";
+      btn.textContent="Saving…"; btn.disabled=true;
+
       try{
-        const r=await fetch(API+"?mode=api&op=update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:getTok(),op:"update",id,status:st,remark:rm})});
+        const r=await fetch(API+"?mode=api&op=update",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ token:tok(), op:"update", id, status, remark })
+        });
         const j=await r.json();
-        if(j&&j.ok){btn.textContent="Saved ✓";setTimeout(()=>{btn.textContent="Save";btn.disabled=false;fetchData();},1000);}
-        else throw new Error(j.error||"Failed");
-      }catch(e){btn.textContent="Failed ✕";setTimeout(()=>{btn.textContent="Save";btn.disabled=false;},1500);}
+        if(!j.ok) throw new Error(j.error||"Failed");
+        btn.textContent="Saved ✓";
+        setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; load(); },800);
+      }catch(e){
+        btn.textContent="Failed ✕";
+        setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; },1200);
+      }
     }
     window.saveRow=saveRow;
 
-    function render(){
-      const tbody=document.querySelector("#grid tbody");
-      tbody.innerHTML="";
-      state.all.forEach(r=>{
-        const id=r["Tracking ID"];
-        const admin=getRole()==="admin";
-        tbody.innerHTML+=`
-          <tr>
-            <td>${id}</td>
-            <td>${r["Date and Time Raised"]||""}</td>
-            <td>${r["Tower"]||""}</td>
-            <td>${r["Flat"]||""}</td>
-            <td>${r["Issue"]||""}</td>
-            <td>${r["Description"]||""}</td>
-            <td>${r["Media URL"]?`<a href="${r["Media URL"]}" target="_blank">Media</a>`:""}</td>
-            <td>${admin?`<select id="st-${id}" class="edit"><option>Open</option><option ${r.Status==="InProgress"?"selected":""}>InProgress</option><option ${r.Status==="Resolved"?"selected":""}>Resolved</option></select>`:`<span class="badge">${r.Status||""}</span>`}</td>
-            <td>${admin?`<input id="rm-${id}" class="edit" value="${r["Redressal Remark"]||""}"> <button id="btn-${id}" class="btn small primary" onclick="saveRow('${id}')">Save</button>`:r["Redressal Remark"]||""}</td>
-            <td>${r["User ID"]||""}</td>
-            <td>${r["Date and Time Resolved"]||""}</td>
-            <td>${r["Time Taken"]||""}</td>
-            <td>${r["Feedback Rating"]||""}</td>
-          </tr>`;
-      });
-    }
+    // Auto refresh
+    let timer=null;
+    $("#ar").onchange=()=>{ if($("#ar").checked){ timer=setInterval(load,60000);} else { clearInterval(timer);} };
+    if($("#ar").checked){ timer=setInterval(load,60000); }
 
-    window.onload=async()=>{
-      if(!getTok()){location.href="/login";return;}
-      state.isAdmin=getRole()==="admin";
-      document.getElementById("logoutBtn").onclick=logoutNow;
-      fetchData();
-    };
+    // Start
+    load();
   </script>
 </body>
 </html>
