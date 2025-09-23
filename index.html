@@ -6,417 +6,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM"/>
 <style>
-  :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9;--header-h:72px;--controls-h:0px}
-  .dark{--bg:#0b1220;--card:#121a2a;--muted:#9aa4b2;--text:#e5e7eb;--border:#1f2937;--hover:#0f172a}
-  *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;background:var(--bg);color:var(--text)}
-  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+  :root{--bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--violet:#7c3aed;--cyan:#06b6d4;--gray:#374151;--danger:#ef4444;--border:#e5e7eb;--hover:#f1f5f9}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text)}
+  header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
   .brand{display:flex;align-items:center;gap:10px}
   .brand img{height:32px;border-radius:6px}
-  h1{margin:0;font-size:20px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .switch,.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px}
-  .switch{display:inline-flex;gap:8px;align-items:center}
-  .btn{cursor:pointer}
-  .btn:hover{background:var(--hover)}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:1px solid var(--border);background:var(--card);padding:8px 10px;border-radius:10px;cursor:pointer}
   .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
   .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
-  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+  .spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:-2px}
   @keyframes spin{to{transform:rotate(360deg)}}
-
-  .sticky-controls{position:sticky;top:var(--header-h);z-index:5;background:var(--bg);padding:8px 20px 12px;box-shadow:0 2px 0 rgba(0,0,0,.04)}
-  .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin:8px 0 14px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
-  .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
-  .card .value{font-size:20px;font-weight:800;margin-top:6px}
-  .card.total{border-left:6px solid var(--green)} .card.open{border-left:6px solid var(--gray)}
-  .card.progress{border-left:6px solid var(--amber)} .card.resolved{border-left:6px solid var(--blue)}
-  .card.avgtime{border-left:6px solid var(--cyan)} .card.avgrating{border-left:6px solid var(--violet)}
-
-  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .tablewrap{margin:12px 20px;height:calc(100vh - var(--header-h) - var(--controls-h) - 24px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
-  table{width:100%;border-collapse:separate;border-spacing:0}
-  thead th{position:sticky;top:0;z-index:1;background:var(--card);border-bottom:1px solid var(--border);padding:10px;text-align:left;font-weight:700;font-size:13px}
-  tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
-  tr:hover td{background:var(--hover)}
-  .sortable{cursor:pointer} .sortable:after{content:" ⇅";color:var(--muted);font-size:12px}
-  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
-  .Open{background:#111827;color:#fff} .InProgress{background:#f59e0b;color:#111} .Resolved{background:#0d6efd;color:#fff}
-  .media img{width:64px;height:auto;border-radius:8px;cursor:pointer}
-  .pagination{display:flex;gap:8px;align-items:center;padding:10px}
-  .spacer{flex:1} .muted{color:var(--muted);font-size:12px}
-  .banner{display:none;margin:10px 20px;padding:10px 12px;border-radius:12px;border:1px solid var(--border)}
-  .banner.error{display:block;background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
-  .banner.info{display:block;background:#e0f2fe;color:#0c4a6e;border-color:#bae6fd}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+  th.sortable{cursor:pointer}
+  th.sortable:after{content:" ⇅";color:var(--muted);font-size:12px}
+  .edit-remark{min-width:160px;padding:6px;border:1px solid var(--border);border-radius:8px}
   #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;align-items:center;justify-content:center}
-  #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}
-  .edit-remark{min-width:180px;max-width:360px;max-height:76px;overflow:auto;outline:1px solid var(--border);border-radius:8px;padding:6px 8px;background:var(--card)}
-  .edit-remark:focus{outline-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(13,110,253,.15);}
-  @media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}} @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  #lightbox img{max-width:90vw;max-height:90vh;border-radius:12px}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo"/>
-    <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
+    <h1>Global Hillview, Enviro Helpdesk</h1>
   </div>
   <div class="toolbar">
-    <label class="switch"><span>Timezone:</span>
-      <select id="tz"><option value="local">Local</option><option value="utc">UTC</option></select>
-    </label>
-    <label class="switch"><span>Auto-refresh</span>
-      <input id="auto" type="checkbox" checked/><span class="muted">60s</span>
-    </label>
-    <button id="dark" class="btn">Dark mode</button>
-    <button id="exportCsv" class="btn">Export CSV</button>
-    <button id="logout" class="btn danger" style="display:inline-flex;align-items:center;gap:8px">
-      <span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span>
-    </button>
+    <button id="export" class="btn">Export CSV</button>
+    <button id="logout" class="btn danger"><span id="logoutLabel">Logout</span><span id="logoutSpin" class="spinner" style="display:none"></span></button>
   </div>
 </header>
 
-<div id="controls" class="sticky-controls">
-  <section class="kpis">
-    <div class="card total"><div class="label">Total</div><div id="kTotal" class="value">0</div></div>
-    <div class="card open"><div class="label">Open</div><div id="kOpen" class="value">0</div></div>
-    <div class="card progress"><div class="label">In Progress</div><div id="kProg" class="value">0</div></div>
-    <div class="card resolved"><div class="label">Resolved</div><div id="kRes" class="value">0</div></div>
-    <div class="card avgtime"><div class="label">Avg Resolution</div><div id="kAvg" class="value">0m</div></div>
-    <div class="card avgrating"><div class="label">Avg Rating</div><div id="kRate" class="value">0</div></div>
-  </section>
-
-  <section class="filters">
-    <select id="fTower"><option value="">All Towers</option></select>
-    <select id="fStatus"><option value="">All Status</option><option>Open</option><option value="InProgress">In Progress</option><option>Resolved</option></select>
-    <input id="fFrom" type="date"><input id="fTo" type="date">
-    <input id="fQ" type="text" placeholder="Search (ID, flat, issue, remark, user…)" style="min-width:260px">
-    <label class="switch"><span>Rows</span><input id="pageSize" type="number" value="10" min="5" max="100" style="width:80px"></label>
-    <button id="apply" class="btn primary">Apply</button><button id="reset" class="btn">Reset</button>
-  </section>
-</div>
-
-<div id="netErr" class="banner error" style="display:none">Network error while fetching data.</div>
-<div id="info" class="banner info" style="display:none">Showing cached data.</div>
-
-<div class="tablewrap">
+<div style="padding:20px">
   <table id="grid">
     <thead>
       <tr>
-        <th class="sortable" data-key="Tracking ID">Tracking ID</th>
-        <th class="sortable" data-key="Date and Time Raised">Date & Time Raised</th>
-        <th class="sortable" data-key="Tower">Tower</th>
-        <th class="sortable" data-key="Flat">Flat</th>
-        <th class="sortable" data-key="Issue">Issue</th>
-        <th class="sortable" data-key="Description">Description</th>
-        <th>Media</th>
-        <th class="sortable" data-key="Status">Status</th>
-        <th class="sortable" data-key="Redressal Remark">Redressal Remark</th>
-        <th class="sortable" data-key="User ID">User ID</th>
-        <th class="sortable" data-key="Date and Time Resolved">Date & Time Resolved</th>
-        <th class="sortable" data-key="__computed_time">Time Taken</th>
-        <th class="sortable" data-key="Feedback Rating">Feedback</th>
+        <th>Tracking ID</th><th>Date</th><th>Tower</th><th>Flat</th><th>Issue</th><th>Description</th><th>Media</th><th>Status</th><th>Remark</th><th>User</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-  <div class="pagination">
-    <button id="prev" class="btn">Prev</button><span id="pageInfo" class="muted">Page 1 / 1</span><button id="next" class="btn">Next</button>
-    <div class="spacer"></div><span id="rowCount" class="muted"></span>
-  </div>
 </div>
 
-<div id="lightbox" onclick="this.style.display='none'"><img id="lightImg" alt=""></div>
+<div id="lightbox"><img id="lightImg"></div>
 
 <script>
-  // ===== Helpers =====
-  const $ = sel => document.querySelector(sel);
-  const fmtDate = (d, tz) => {
-    if(!d) return "";
-    const o={year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz==="utc"?"UTC":undefined};
-    const s=new Intl.DateTimeFormat(undefined,o).format(d);
-    return tz==="utc"?s+" UTC":s;
-  };
-  const parseDate = s => { if(!s) return null; const d=new Date(String(s).includes("T")?s:String(s).replace(" ","T")); return isNaN(d)?null:d; }
-  const eod = v => { const d=new Date(v); d.setHours(23,59,59,999); return d; }
-  const msHuman = ms => { if(ms==null||isNaN(ms)) return ""; const m=Math.floor(ms/60000); if(m<60)return `${m}m`; const h=Math.floor(m/60),r=m%60; if(h<24)return `${h}h ${r}m`; const d=Math.floor(h/24),rh=h%24; return `${d}d ${rh}h ${r}m`; };
-  const esc = s => String(s||"").replace(/"/g,"&quot;");
+const $=s=>document.querySelector(s);
 
-  function openLightbox(url){ $("#lightImg").src=url; $("#lightbox").style.display="flex"; }
-  function setHeights(){ document.documentElement.style.setProperty("--header-h", document.querySelector("header").offsetHeight+"px"); document.documentElement.style.setProperty("--controls-h", $("#controls").offsetHeight+"px"); }
-  addEventListener("resize", setHeights);
+async function api(url,opt={}){
+  const r=await fetch(url,{credentials:"include",cache:"no-store",...opt});
+  const ct=r.headers.get("content-type")||"";
+  if(ct.includes("application/json")) return r.json();
+  return { ok:r.ok, status:r.status, text:await r.text() };
+}
 
-  // ===== State =====
-  const S = { all:[], filtered:[], sort:{key:"Date and Time Raised",dir:"desc"}, page:1, size:10, tz:"local", isAdmin:false, timer:null, lastOk:true };
+async function loadData(){
+  const data=await api("/api?mode=data");
+  if(!Array.isArray(data)){ alert("Bad data"); return; }
+  const tb=$("#grid tbody"); tb.innerHTML="";
+  data.forEach(r=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${r["Tracking ID"]}</td>
+      <td>${r["Date and Time Raised"]||""}</td>
+      <td>${r.Tower||""}</td>
+      <td>${r.Flat||""}</td>
+      <td>${r.Issue||""}</td>
+      <td>${r.Description||""}</td>
+      <td>${mediaCell(r["Media URL"])}</td>
+      <td><select class="st" data-id="${r["Tracking ID"]}">
+        <option${r.Status==="Open"?" selected":""}>Open</option>
+        <option value="InProgress"${r.Status==="InProgress"?" selected":""}>In Progress</option>
+        <option${r.Status==="Resolved"?" selected":""}>Resolved</option>
+      </select></td>
+      <td><div style="display:flex;gap:6px;align-items:center">
+        <div class="edit-remark" contenteditable="true" data-id="${r["Tracking ID"]}">${r["Redressal Remark"]||""}</div>
+        <button class="btn save" data-id="${r["Tracking ID"]}">Save</button>
+      </div></td>
+      <td>${r["User ID"]||""}</td>
+    `;
+    tb.appendChild(tr);
+  });
+  attachRowHandlers();
+}
 
-  // ===== Session =====
-  async function getSession(){
-    const r = await fetch("/api?mode=api&op=sessionInfo", { credentials:"include" });
-    const j = await r.json();
-    S.isAdmin = !!(j && j.info && String(j.info.role).toLowerCase()==="admin");
-  }
-  function setLogoutLoading(on){ $("#logout").disabled=!!on; $("#logoutSpin").style.display=on?'inline-block':'none'; $("#logoutLabel").textContent=on?'Logging out…':'Logout'; }
-  async function doLogout(){
-    try{
-      setLogoutLoading(true);
-      await fetch("/api?mode=api&op=logout", { credentials:"include" });
-      location.href="/login";
-    }catch(e){
-      alert("Logout failed: " + (e?.message||e));
-      setLogoutLoading(false);
-    }
-  }
+function mediaCell(url){
+  if(!url) return "—";
+  if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<img src="${url}" style="width:64px;cursor:pointer" onclick="openLightbox('${url}')">`;
+  if(/\.(mp4|webm)$/i.test(url)) return `<video controls style="width:120px"><source src="${url}"></video>`;
+  return `<a href="${url}" target="_blank">Open</a>`;
+}
 
-  // ===== Data =====
-  function normalize(rows){
-    return rows.map(r=>{
-      const raised=parseDate(r["Date and Time Raised"]);
-      const resolved=parseDate(r["Date and Time Resolved"]);
-      let ms=null;
-      if(raised && resolved) ms=Math.max(0, resolved - raised);
-      if(ms==null && r["Time Taken"]){
-        const m=String(r["Time Taken"]).match(/(\d+)\s*m/); if(m) ms=parseInt(m[1],10)*60000;
-      }
-      return { ...r, __raised:raised, __resolved:resolved, __computed_time:ms };
-    });
-  }
+function openLightbox(url){ $("#lightImg").src=url; $("#lightbox").style.display="flex"; }
+$("#lightbox").onclick=()=>$("#lightbox").style.display="none";
 
-  async function fetchData(){
-    try{
-      const r = await fetch("/api?mode=data", { cache:"no-store", credentials:"include" });
-      if(!r.ok) throw new Error(r.statusText);
-      const data = await r.json();
-      S.lastOk = true; $("#netErr").style.display="none"; $("#info").style.display="none";
-      S.all = normalize(data);
-      populateTower(S.all);
-      applyFilters();
-      setHeights();
-    }catch(e){
-      $("#netErr").style.display="block";
-      if(S.all.length){ $("#info").style.display="block"; render(); }
-      S.lastOk = false;
-    }
-  }
+function attachRowHandlers(){
+  document.querySelectorAll("select.st").forEach(sel=>{
+    sel.onchange=async()=>{
+      sel.disabled=true;
+      await updateField(sel.dataset.id,"Status",sel.value);
+      sel.disabled=false;
+    };
+  });
+  document.querySelectorAll("button.save").forEach(btn=>{
+    btn.onclick=async()=>{
+      const id=btn.dataset.id;
+      const val=document.querySelector(`.edit-remark[data-id="${id}"]`).textContent.trim();
+      btn.textContent="Saving…";
+      await updateField(id,"Redressal Remark",val);
+      btn.textContent="Save";
+    };
+  });
+}
 
-  function populateTower(data){
-    const sel = $("#fTower"); const have = new Set([...sel.options].map(o=>o.value));
-    [...new Set(data.map(x=>x.Tower).filter(Boolean))].sort().forEach(v=>{
-      if(!have.has(v)){ const o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o); }
-    });
-  }
+async function updateField(id,field,value){
+  const r=await api("/api?mode=api&op=update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,field,value})});
+  if(!(r&&r.success)){ alert("Update failed: "+(r.message||r.text||"")); }
+}
 
-  // ===== Filters / Render =====
-  function applyFilters(){
-    const tower = $("#fTower").value;
-    const status = $("#fStatus").value;
-    const from = $("#fFrom").value ? new Date($("#fFrom").value) : null;
-    const to = $("#fTo").value ? eod($("#fTo").value) : null;
-    const q = $("#fQ").value.trim().toLowerCase();
+$("#logout").onclick=async()=>{
+  $("#logoutLabel").textContent="Logging out…"; $("#logoutSpin").style.display="inline-block";
+  await api("/api?mode=api&op=logout",{method:"POST"});
+  location.href="/login";
+};
 
-    S.filtered = S.all.filter(r=>{
-      if(tower && r.Tower !== tower) return false;
-      if(status && r.Status !== status) return false;
-      if(from && r.__raised && r.__raised < from) return false;
-      if(to && r.__raised && r.__raised > to) return false;
-      if(q){
-        const blob = [r["Tracking ID"],r["Tower"],r["Flat"],r["Issue"],r["Description"],r["Redressal Remark"],r["Status"],r["User ID"],r["Feedback Rating"]]
-          .map(x=>String(x||"").toLowerCase()).join(" ");
-        if(!blob.includes(q)) return false;
-      }
-      return true;
-    });
-    S.page = 1;
-    render();
-  }
+$("#export").onclick=()=>{
+  const rows=[...document.querySelectorAll("#grid tbody tr")].map(tr=>[...tr.children].map(td=>td.innerText));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="helpdesk.csv"; a.click();
+};
 
-  function resetFilters(){
-    $("#fTower").value=""; $("#fStatus").value=""; $("#fFrom").value=""; $("#fTo").value=""; $("#fQ").value=""; S.page=1; S.filtered=S.all.slice(); render();
-  }
-
-  function render(){
-    const {key,dir} = S.sort;
-    const data = S.filtered.slice().sort((a,b)=>{
-      const av = key==="__computed_time" ? a.__computed_time : (key==="Date and Time Raised"?a.__raised:(key==="Date and Time Resolved"?a.__resolved:a[key]));
-      const bv = key==="__computed_time" ? b.__computed_time : (key==="Date and Time Raised"?b.__raised:(key==="Date and Time Resolved"?b.__resolved:b[key]));
-      const aa = av==null?"":av, bb = bv==null?"":bv;
-      if(aa<bb) return dir==="asc"?-1:1; if(aa>bb) return dir==="asc"?1:-1; return 0;
-    });
-
-    const start = (S.page-1)*S.size;
-    const slice = data.slice(start, start+S.size);
-
-    // KPIs
-    $("#kTotal").textContent = S.filtered.length;
-    $("#kOpen").textContent = S.filtered.filter(x=>x.Status==="Open").length;
-    $("#kProg").textContent = S.filtered.filter(x=>x.Status==="InProgress").length;
-    const resolvedRows = S.filtered.filter(x=>x.Status==="Resolved");
-    $("#kRes").textContent = resolvedRows.length;
-    const avgMs = resolvedRows.length ? Math.round(resolvedRows.reduce((s,x)=>s+(x.__computed_time||0),0)/resolvedRows.length) : 0;
-    const ratings = resolvedRows.map(x=>parseFloat(x["Feedback Rating"])).filter(n=>!isNaN(n));
-    $("#kAvg").textContent = msHuman(avgMs);
-    $("#kRate").textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
-
-    const tbody = $("#grid tbody");
-    tbody.innerHTML = "";
-    slice.forEach(r=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><span class="muted" style="border-bottom:1px dashed var(--muted);cursor:copy" title="Click to copy"
-              onclick="navigator.clipboard.writeText('${esc(r["Tracking ID"])}')">${r["Tracking ID"]||""}</span></td>
-        <td>${fmtDate(r.__raised, S.tz)}</td>
-        <td>${r.Tower||""}</td>
-        <td>${r.Flat||""}</td>
-        <td>${r.Issue||""}</td>
-        <td>${r.Description||""}</td>
-        <td>${renderMedia(r["Media URL"])}</td>
-        <td>${
-          S.isAdmin
-          ? `<select class="st" data-id="${r["Tracking ID"]}">
-               <option ${r.Status==="Open"?"selected":""}>Open</option>
-               <option value="InProgress" ${r.Status==="InProgress"?"selected":""}>In Progress</option>
-               <option ${r.Status==="Resolved"?"selected":""}>Resolved</option>
-             </select>`
-          : `<span class="badge ${r.Status||""}">${r.Status||""}</span>`
-        }</td>
-        <td>${
-          S.isAdmin
-          ? `<div style="display:flex;gap:6px;align-items:center">
-               <div class="edit-remark" contenteditable="true" data-id="${r["Tracking ID"]}">${(r["Redressal Remark"]||"").replace(/</g,"&lt;")}</div>
-               <button class="btn small save" data-id="${r["Tracking ID"]}">Save</button>
-             </div>`
-          : `${r["Redressal Remark"]||""}`
-        }</td>
-        <td>${r["User ID"]||""}</td>
-        <td>${fmtDate(r.__resolved, S.tz)}</td>
-        <td>${msHuman(r.__computed_time)}</td>
-        <td>${r["Feedback Rating"]||""}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    const max = Math.max(1, Math.ceil(data.length / S.size));
-    $("#pageInfo").textContent = `Page ${S.page} / ${max}`;
-    $("#rowCount").textContent = `${data.length} row(s), showing ${slice.length}`;
-
-    // Admin hooks
-    if (S.isAdmin) {
-      tbody.querySelectorAll("select.st").forEach(sel=>{
-        sel.addEventListener("change", async ()=>{
-          const id = sel.dataset.id, val = sel.value;
-          sel.disabled = true;
-          try {
-            const r = await fetch("/api?mode=api&op=update", {
-              method:"POST",
-              headers:{ "Content-Type":"application/json" },
-              credentials:"include",
-              body: JSON.stringify({ id, field:"Status", value:val })
-            });
-            const j = await r.json();
-            if(!j.success) throw new Error(j.message||"Update failed");
-            await fetchData(); // refresh stamps & KPIs
-          } catch(e) {
-            alert(e.message||e);
-          } finally {
-            sel.disabled = false;
-          }
-        });
-      });
-
-      tbody.querySelectorAll("button.save").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.dataset.id;
-          const box = tbody.querySelector(`.edit-remark[data-id="${id}"]`);
-          const value = (box?.textContent||"").trim();
-          btn.disabled = true; const old = btn.textContent; btn.textContent = "Saving…";
-          try{
-            const r = await fetch("/api?mode=api&op=update", {
-              method:"POST",
-              headers:{ "Content-Type":"application/json" },
-              credentials:"include",
-              body: JSON.stringify({ id, field:"Redressal Remark", value })
-            });
-            const j = await r.json();
-            if(!j.success) throw new Error(j.message||"Update failed");
-            // brief "Saved" animation
-            btn.textContent = "Saved"; setTimeout(()=>btn.textContent=old, 900);
-          }catch(e){
-            alert(e.message||e); btn.textContent = old;
-          } finally {
-            btn.disabled = false;
-          }
-        });
-      });
-
-      tbody.querySelectorAll(".edit-remark").forEach(div=>{
-        div.addEventListener("keydown", e=>{
-          if((e.ctrlKey||e.metaKey) && e.key==="Enter"){
-            const id = div.dataset.id;
-            const b = tbody.querySelector(`button.save[data-id="${id}"]`);
-            if(b) b.click();
-            e.preventDefault();
-          }
-        });
-      });
-    }
-  }
-
-  function renderMedia(url){
-    if(!url) return "<span class='muted'>No media</span>";
-    if(/\.(jpe?g|png|gif|webp)$/i.test(url)) return `<div class="media"><img src="${esc(url)}" onclick="openLightbox('${esc(url)}')"></div>`;
-    if(/\.(mp4|webm|mov)$/i.test(url)) return `<div class="media"><video controls style="width:140px"><source src="${esc(url)}"></video></div>`;
-    if(/\.(mp3|wav|m4a)$/i.test(url)) return `<div class="media"><audio controls src="${esc(url)}"></audio></div>`;
-    return `<a href="${esc(url)}" target="_blank" rel="noopener">Open</a>`;
-  }
-
-  // ===== CSV =====
-  function exportCSV(){
-    const rows = S.filtered.length ? S.filtered : S.all;
-    const hdr = ["Tracking ID","Date & Time Raised","Tower","Flat","Issue","Description","Media","Status","Redressal Remark","User ID","Date & Time Resolved","Time Taken","Feedback"];
-    const csv = [hdr.join(",")];
-    rows.forEach(r=>{
-      const vals = [
-        r["Tracking ID"]||"", fmtDate(r.__raised,S.tz), r.Tower||"", r.Flat||"", r.Issue||"",
-        (r.Description||"").replace(/"/g,'""'), r["Media URL"]||"", r.Status||"",
-        (r["Redressal Remark"]||"").replace(/"/g,'""'), r["User ID"]||"",
-        fmtDate(r.__resolved,S.tz), msHuman(r.__computed_time), r["Feedback Rating"]||""
-      ].map(v=>`"${String(v)}"`);
-      csv.push(vals.join(","));
-    });
-    const blob = new Blob([csv.join("\n")], {type:"text/csv;charset=utf-8"});
-    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="helpdesk.csv"; a.click();
-  }
-
-  // ===== Events / Init =====
-  function attachSort(){
-    document.querySelectorAll("th.sortable").forEach(th=>{
-      th.addEventListener("click", ()=>{
-        const k = th.dataset.key;
-        if(S.sort.key===k){ S.sort.dir = S.sort.dir==="asc"?"desc":"asc"; }
-        else { S.sort.key=k; S.sort.dir="asc"; }
-        render();
-      });
-    });
-  }
-
-  (async function init(){
-    $("#dark").addEventListener("click", ()=>document.body.classList.toggle("dark"));
-    $("#exportCsv").addEventListener("click", exportCSV);
-    $("#apply").addEventListener("click", applyFilters);
-    $("#reset").addEventListener("click", resetFilters);
-    $("#prev").addEventListener("click", ()=>{ if(S.page>1){ S.page--; render(); }});
-    $("#next").addEventListener("click", ()=>{ const max=Math.max(1, Math.ceil(S.filtered.length/S.size)); if(S.page<max){ S.page++; render(); }});
-    $("#pageSize").addEventListener("change", e=>{ S.size=Math.max(5, Math.min(100, parseInt(e.target.value)||10)); S.page=1; render(); });
-    $("#tz").addEventListener("change", e=>{ S.tz=e.target.value; render(); });
-    $("#fQ").addEventListener("input", ((fn,ms)=>{let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}})(applyFilters,250));
-    $("#logout").addEventListener("click", doLogout);
-
-    attachSort();
-    setHeights();
-
-    await getSession();
-    await fetchData();
-    S.timer = setInterval(()=>{ if($("#auto").checked) fetchData(); }, 60000);
-  })();
+loadData();
 </script>
 </body>
 </html>
