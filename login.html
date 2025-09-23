@@ -1,68 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sign in · Helpdesk</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign in · Global Hillview Helpdesk</title>
+  <link rel="icon" href="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" />
   <style>
-    :root { --bg:#f6f7fb; --card:#fff; --txt:#0f172a; --muted:#64748b; --brand:#2563eb; --error:#ef4444; }
-    * { box-sizing:border-box; font-family:Inter,system-ui,Arial; }
-    body { margin:0; background:var(--bg); color:var(--txt); display:grid; place-items:center; min-height:100dvh; }
-    .card { width:min(440px, calc(100% - 2rem)); background:var(--card); border-radius:16px; padding:28px; box-shadow:0 10px 30px rgba(2,6,23,.08); }
-    h1 { margin:0 0 6px; font-size:28px; }
-    p.sub { margin:0 0 20px; color:var(--muted); }
-    label { display:block; font-size:13px; color:var(--muted); margin:14px 0 6px; }
-    input { width:100%; padding:12px 14px; border:1px solid #e5e7eb; border-radius:10px; font-size:15px; }
-    button { width:100%; margin-top:18px; padding:12px 16px; border:0; border-radius:10px; background:var(--brand); color:#fff; font-weight:600; cursor:pointer; }
-    button[disabled]{ opacity:.7; cursor:wait; }
-    .err { margin-top:12px; padding:10px 12px; border-radius:10px; background:#fee2e2; color:#991b1b; display:none; }
-    .spinner { display:inline-block; width:1em; height:1em; border:2px solid #fff; border-top-color:transparent; border-radius:50%; margin-right:.5em; vertical-align:-.15em; animation:spin 1s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
+    :root{
+      --bg:#f7f9fc; --card:#fff; --text:#0f172a; --muted:#6b7280; --blue:#0d6efd; --red:#ef4444; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial; color:var(--text); background:var(--bg); display:grid; place-items:center}
+    .card{width:min(560px,92vw); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 26px 24px; box-shadow:0 6px 30px rgba(0,0,0,.05)}
+    h1{margin:0 0 18px; font-size:28px}
+    label{display:block; font-weight:600; margin:12px 0 4px}
+    input{width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:12px; font-size:16px}
+    .row{display:grid; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+    .brand img{height:30px; border-radius:6px}
+    .muted{color:var(--muted); font-size:13px}
+    .btn{width:100%; margin-top:16px; background:var(--blue); color:#fff; font-weight:700; border:none; padding:12px 14px; border-radius:12px; cursor:pointer}
+    .btn[disabled]{opacity:.7; cursor:not-allowed}
+    .error{margin-top:12px; display:none; background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; border-radius:10px; padding:10px 12px; font-weight:600}
+    .spin{display:inline-block; width:16px; height:16px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; vertical-align:-3px; margin-right:8px; animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
   <div class="card">
+    <div class="brand">
+      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo">
+      <div>
+        <div style="font-weight:800">Global Hillview, Enviro Helpdesk</div>
+        <div class="muted">Administrator sign in</div>
+      </div>
+    </div>
+
     <h1>Sign in</h1>
-    <p class="sub">Enter your credentials to access the Helpdesk.</p>
-    <label>Username</label>
-    <input id="u" autocomplete="username" value="admin" />
-    <label>Password</label>
-    <input id="p" type="password" autocomplete="current-password" />
-    <button id="btn"><span id="btntxt">Sign in</span></button>
-    <div id="err" class="err"></div>
-    <p class="sub" style="margin-top:10px">Tip: use <b>admin</b> as username to get admin rights.</p>
+
+    <div class="row">
+      <label for="u">Username</label>
+      <input id="u" autocomplete="username" placeholder="admin" />
+
+      <label for="p">Password</label>
+      <input id="p" type="password" autocomplete="current-password" placeholder="••••••••" />
+    </div>
+
+    <button id="btn" class="btn">
+      <span id="btxt">Sign in</span>
+    </button>
+
+    <div id="err" class="error">Unexpected error.</div>
+    <div class="muted" style="margin-top:10px">Tip: use <b>admin</b> as username to get admin rights.</div>
   </div>
 
-<script>
-const $ = (id)=>document.getElementById(id);
+  <script>
+    const $ = (id)=>document.getElementById(id);
 
-$("btn").onclick = async () => {
-  $("err").style.display="none";
-  const username = $("u").value.trim();
-  const password = $("p").value;
-  $("btn").disabled = true;
-  $("btntxt").innerHTML = '<span class="spinner"></span>Signing in…';
-  try {
-    const res = await fetch("/api?mode=api&op=login", {
-      method:"POST",
-      headers:{ "content-type":"application/json" },
-      credentials:"same-origin",
-      body: JSON.stringify({ username, password })
+    async function api(path, body) {
+      const opts = body
+        ? { method:"POST", headers:{ "content-type":"application/json" }, body:JSON.stringify(body) }
+        : {};
+      const res = await fetch(path, { ...opts, credentials:"same-origin", cache:"no-store" });
+      const clone = res.clone();
+      try { return await clone.json(); }
+      catch { return { ok: res.ok, status: res.status, text: await res.text() }; }
+    }
+
+    function setBusy(on){
+      $("btn").disabled = !!on;
+      $("btxt").innerHTML = on ? '<span class="spin"></span>Signing in…' : 'Sign in';
+    }
+
+    async function doLogin(){
+      $("err").style.display = "none";
+      setBusy(true);
+      try{
+        const payload = { username:$("u").value.trim(), password:$("p").value };
+        const r = await api("/api?mode=api&op=login", payload);
+        if(!(r && r.ok)) throw new Error(r?.error || "login_failed");
+        location.href = "/";
+      }catch(e){
+        $("err").textContent = `Login failed: ${e.message || e}`;
+        $("err").style.display = "block";
+      }finally{
+        setBusy(false);
+      }
+    }
+
+    $("btn").addEventListener("click", doLogin);
+    // submit with Enter
+    ["u","p"].forEach(id=>{
+      $(id).addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doLogin(); }});
     });
-    if (!res.ok) throw new Error((await res.json()).error || "login_failed");
-    // ok => go to dashboard
-    location.href = "/";
-  } catch (e) {
-    $("err").textContent = "Login failed: " + (e.message || "error");
-    $("err").style.display="block";
-  } finally {
-    $("btn").disabled = false;
-    $("btntxt").textContent = "Sign in";
-  }
-};
-</script>
+  </script>
 </body>
 </html>
