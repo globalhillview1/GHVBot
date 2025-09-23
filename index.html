@@ -1,217 +1,284 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Global Hillview, Enviro Helpdesk Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root{
-      --bg:#f7f9fc;--card:#fff;--muted:#6b7280;--text:#0f172a;--border:#e5e7eb;
-      --blue:#0d6efd;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--violet:#7c3aed;--danger:#ef4444;--hover:#f1f5f9;
-      --header-h:72px;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;background:var(--bg);border-bottom:1px solid var(--border)}
-    .brand{display:flex;align-items:center;gap:10px}
-    .brand img{height:32px;width:auto;border-radius:8px}
-    h1{margin:0;font-size:20px}
-    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-    .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);background:var(--card);border-radius:10px;padding:6px 10px}
-    .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:8px 10px;border-radius:10px;cursor:pointer}
-    .btn:hover{background:var(--hover)}
-    .btn.primary{background:var(--blue);color:#fff;border-color:transparent}
-    .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
-    .btn.small{padding:4px 8px;font-size:12px}
-    .sticky{position:sticky;top:var(--header-h);z-index:900;background:var(--bg);padding:10px 18px 12px}
-    .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:10px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px}
-    .card .label{font-size:12px;color:var(--muted);text-transform:uppercase}
-    .card .val{font-weight:800;font-size:20px;margin-top:6px}
-    .c1{border-left:6px solid var(--green)} .c2{border-left:6px solid #111827}
-    .c3{border-left:6px solid var(--amber)} .c4{border-left:6px solid var(--blue)}
-    .c5{border-left:6px solid var(--cyan)} .c6{border-left:6px solid var(--violet)}
-    .err{display:none;margin:10px 18px;padding:10px;border:1px solid #fecaca;background:#fee2e2;color:#7f1d1d;border-radius:12px}
-    .tablewrap{margin:12px 18px;height:calc(100vh - var(--header-h) - 160px);overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:16px}
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    thead th{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:10px;font-size:13px;text-align:left}
-    tbody td{border-top:1px solid var(--border);padding:10px;vertical-align:top;font-size:14px}
-    tr:hover td{background:var(--hover)}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}
-    .Open{background:#111827;color:#fff}.InProgress{background:#f59e0b;color:#111}.Resolved{background:#0d6efd;color:#fff}
-    .edit{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Helpdesk Dashboard</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f8fb;--ink:#0f172a;--muted:#6b7280;--card:#fff;--accent:#2563eb;--accent-600:#1d4ed8;
+    --ok:#16a34a;--warn:#ca8a04;--chip:#eef2ff;--ring:0 0 0 .25rem rgba(37,99,235,.25);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Inter',system-ui}
+  header{
+    position:sticky;top:0;z-index:10;background:linear-gradient(#fff,#fffcc0 0) top/100% 0 no-repeat,#fff;
+    border-bottom:1px solid #e5e7eb;display:flex;gap:16px;align-items:center;justify-content:space-between;
+    padding:12px 18px
+  }
+  .title{font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .row{display:flex;gap:10px;align-items:center}
+  select,input[type="date"],input[type="text"]{
+    border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:6px 10px;outline:0
+  }
+  select:focus,input:focus{border-color:var(--accent);box-shadow:var(--ring)}
+  .btn{
+    border:0;border-radius:10px;padding:8px 12px;background:var(--accent);color:#fff;font-weight:700;
+    cursor:pointer;display:inline-grid;grid-auto-flow:column;gap:8px;align-items:center
+  }
+  .btn:hover{background:var(--accent-600)}
+  .btn.secondary{background:#1118270d;color:#111827;border:1px solid #e5e7eb}
+  .spinner{
+    width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;
+    display:inline-block;animation:spin .7s linear infinite
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  main{max-width:1200px;margin:16px auto;padding:0 16px}
+  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;padding:14px}
+  .stat h3{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase}
+  .stat .n{font-size:28px;font-weight:800}
+  .table{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;overflow:auto}
+  table{border-collapse:separate;border-spacing:0;width:100%}
+  th,td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  th{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+  tbody tr:last-child td{border-bottom:0}
+  .chip{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--chip);font-weight:700}
+  .status{min-width:120px}
+  .save-btn{min-width:84px}
+  .save-btn.saving{background:#11182714;color:#111827;border:1px solid #e5e7eb}
+  .save-btn.saved{background:var(--ok);color:#fff}
+  .toast{
+    position:fixed;right:16px;bottom:16px;background:#111827; color:#fff;padding:10px 14px;border-radius:10px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(6px);pointer-events:none
+  }
+  .toast.show{animation:toast .9s ease forwards}
+  @keyframes toast{20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+  .hidden{display:none !important}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <img src="https://drive.google.com/uc?export=view&id=1opE1H0_mWwguRjSaDlGPPVV3wN8Pn2jM" alt="logo" />
-      <h1>Global Hillview, Enviro Helpdesk Dashboard</h1>
-    </div>
-    <div class="toolbar">
-      <label class="chip">Timezone:
-        <select id="tz"><option value="local">Local</option><option value="utc">UTC</option></select>
-      </label>
-      <label class="chip">Auto-refresh <input id="ar" type="checkbox" checked /> <span style="color:#6b7280">60s</span></label>
-      <button id="csv" class="btn">Export CSV</button>
-      <button id="logout" class="btn danger"><span id="logoutText">Logout</span></button>
-    </div>
-  </header>
 
-  <div class="sticky">
-    <section class="kpis">
-      <div class="card c1"><div class="label">Total</div><div id="kpiTotal" class="val">0</div></div>
-      <div class="card c2"><div class="label">Open</div><div id="kpiOpen" class="val">0</div></div>
-      <div class="card c3"><div class="label">In Progress</div><div id="kpiProgress" class="val">0</div></div>
-      <div class="card c4"><div class="label">Resolved</div><div id="kpiResolved" class="val">0</div></div>
-      <div class="card c5"><div class="label">Avg Resolution</div><div id="kpiAvgTime" class="val">0m</div></div>
-      <div class="card c6"><div class="label">Avg Rating</div><div id="kpiAvgRating" class="val">0</div></div>
-    </section>
+<header>
+  <div class="title">Global Hillview, Enviro Helpdesk Dashboard</div>
+  <div class="row">
+    <button class="btn secondary" id="export">Export CSV</button>
+    <button class="btn" id="logoutBtn"><span class="txt">Logout</span></button>
   </div>
+</header>
 
-  <div id="err" class="err">Network error while fetching data.</div>
+<main>
+  <section class="stats" id="stats">
+    <div class="stat"><h3>Total</h3><div class="n" id="sTotal">0</div></div>
+    <div class="stat"><h3>Open</h3><div class="n" id="sOpen">0</div></div>
+    <div class="stat"><h3>In Progress</h3><div class="n" id="sProg">0</div></div>
+    <div class="stat"><h3>Resolved</h3><div class="n" id="sDone">0</div></div>
+    <div class="stat"><h3>Avg Resolution</h3><div class="n" id="sAvg">0m</div></div>
+  </section>
 
-  <div class="tablewrap">
+  <section class="table">
     <table id="grid">
       <thead>
         <tr>
           <th>Tracking ID</th>
-          <th>Date & Time Raised</th>
+          <th>Date &amp; Time Raised</th>
           <th>Tower</th>
           <th>Flat</th>
           <th>Issue</th>
           <th>Description</th>
           <th>Media</th>
-          <th>Status</th>
+          <th class="status">Status</th>
           <th>Redressal Remark</th>
           <th>User ID</th>
-          <th>Date & Time Resolved</th>
+          <th>Date &amp; Time Resolved</th>
           <th>Time Taken</th>
           <th>Feedback</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="rows">
+        <tr><td colspan="14" style="text-align:center;padding:24px">Loading…</td></tr>
+      </tbody>
     </table>
-  </div>
+  </section>
+</main>
 
-  <script>
-    const API="/api";
-    const $=(s)=>document.querySelector(s);
+<div class="toast" id="toast">Saved</div>
 
-    // Auth gate
-    function tok(){try{return localStorage.getItem("session");}catch(e){return null}}
-    function role(){try{return localStorage.getItem("role")||"user";}catch(e){return "user"}}
-    if(!tok()){ location.replace("/login"); }
+<script>
+const $ = (s, el=document) => el.querySelector(s);
 
-    const state={all:[],isAdmin:role()==="admin"};
+const t = (html) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = html.trim();
+  return tr;
+}
 
-    // Logout animation
-    $("#logout").onclick=()=>{ $("#logoutText").textContent="Logging out…"; setTimeout(()=>{localStorage.clear(); location.replace("/login");},800); };
+const STATUS = ['Open','In Progress','Resolved'];
 
-    async function load(){
-      try{
-        const r=await fetch(API+"?mode=data",{cache:"no-store"});
-        const data=await r.json();
-        state.all=data;
-        render();
-      }catch(e){
-        $("#err").style.display="block";
-      }
+let SESSION = { ok:false, role:'user' };
+
+async function ensureSession(){
+  const res = await fetch('/api?mode=sessionInfo', {credentials:'include'});
+  const j = await safeJSON(res);
+  SESSION = { ok: !!j?.info?.ok, role: j?.info?.role || 'user' };
+}
+
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 1200);
+}
+
+function savingButton(btn){
+  btn.classList.remove('saved');
+  btn.classList.add('saving');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+}
+function savedButton(btn){
+  btn.classList.remove('saving');
+  btn.classList.add('saved');
+  btn.disabled = false;
+  btn.textContent = 'Saved';
+  setTimeout(()=>{btn.classList.remove('saved');btn.textContent='Save';}, 1100);
+}
+function failedButton(btn, msg='Failed'){
+  btn.classList.remove('saving','saved');
+  btn.disabled = false;
+  btn.textContent = msg;
+  setTimeout(()=>btn.textContent='Save', 1200);
+}
+
+async function loadData(){
+  const res = await fetch('/api?mode=data', {credentials:'include'});
+  const j = await safeJSON(res);
+
+  const body = $('#rows');
+  body.innerHTML = '';
+  let total=0, open=0, prog=0, done=0;
+
+  (j||[]).forEach(row => {
+    total++;
+    if(row.Status==='Open') open++;
+    else if(row.Status==='InProgress' || row.Status==='In Progress') prog++;
+    else if(row.Status==='Resolved') done++;
+
+    const media = row["Media URL"] ? `<img src="${row["Media URL"]}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb" onerror="this.replaceWith(document.createTextNode('—'))">` : '—';
+
+    const statusSel = `
+      <select class="status-input" ${SESSION.role!=='admin'?'disabled':''}>
+        ${STATUS.map(s => `<option ${matchStatus(row.Status)===s?'selected':''}>${s}</option>`).join('')}
+      </select>`;
+
+    const remark = `
+      <input class="remark-input" type="text" placeholder="Remark" value="${escapeAttr(row["Redressal Remark"]||'')}" ${SESSION.role!=='admin'?'disabled':''} />`;
+
+    const saveBtn = `<button class="btn save-btn ${SESSION.role!=='admin'?'hidden':''}">Save</button>`;
+
+    body.appendChild(t(`
+      <tr data-id="${row["Tracking ID"]}">
+        <td>${row["Tracking ID"]}</td>
+        <td>${fmt(row["Date and Time Raised"])}</td>
+        <td>${row["Tower"]||'—'}</td>
+        <td>${row["Flat"]||'—'}</td>
+        <td>${row["Issue"]||'—'}</td>
+        <td>${row["Description"]||'—'}</td>
+        <td>${media}</td>
+        <td>${statusSel}</td>
+        <td>${remark}</td>
+        <td>${row["User ID"]||'—'}</td>
+        <td>${fmt(row["Date and Time Resolved"])||'—'}</td>
+        <td>${row["Time Taken"]||'—'}</td>
+        <td>${row["Feedback Rating"]||'—'}</td>
+        <td>${saveBtn}</td>
+      </tr>
+    `));
+  });
+
+  $('#sTotal').textContent=total;
+  $('#sOpen').textContent=open;
+  $('#sProg').textContent=prog;
+  $('#sDone').textContent=done;
+  // Simple proxy for average resolution available or not
+  $('#sAvg').textContent = j?.length? (j[0]["Time Taken"]||'0m') : '0m';
+
+  // Wire save handlers
+  $('#rows').addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('.save-btn');
+    if(!btn) return;
+    const tr = btn.closest('tr');
+    const id = tr.dataset.id;
+    const status = $('.status-input', tr).value;
+    const remark = $('.remark-input', tr).value.trim();
+
+    savingButton(btn);
+    try{
+      const r = await fetch('/api?mode=update', {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body: JSON.stringify({ id, status, remark }),
+        credentials:'include'
+      });
+      const j = await safeJSON(r);
+      if(!j?.ok) throw new Error(j?.error||'Update failed');
+      savedButton(btn);
+      toast('Saved');
+    }catch(ex){
+      failedButton(btn, 'Failed');
+      alert(`Save failed: ${ex.message}`);
     }
+  });
+}
 
-    function cellMedia(u){
-      if(!u) return "";
-      return `<a href="${u}" target="_blank" rel="noopener">Media</a>`;
-    }
+$('#logoutBtn').addEventListener('click', async () => {
+  const btn = $('#logoutBtn'); const txt = $('.txt', btn);
+  txt.innerHTML = '<span class="spinner"></span> Logging out…';
+  btn.disabled = true;
+  try{
+    const r = await fetch('/api?mode=logout', {method:'POST', credentials:'include'});
+    const j = await safeJSON(r);
+    if(!j?.ok) throw new Error('Logout failed');
+    txt.textContent='Logged out';
+    setTimeout(()=> location.replace('/login'), 250);
+  }catch(ex){
+    btn.disabled=false; txt.textContent='Logout';
+    alert(`Logout failed: ${ex.message}`);
+  }
+});
 
-    function rowHtml(r){
-      const id=r["Tracking ID"];
-      const st=r["Status"]||"Open";
-      const remark=r["Redressal Remark"]||"";
-      const admin=state.isAdmin;
+function matchStatus(s){
+  if(!s) return 'Open';
+  s = String(s).toLowerCase();
+  if(s.startsWith('in')) return 'In Progress';
+  if(s.startsWith('res')) return 'Resolved';
+  return 'Open';
+}
+function fmt(v){ return v || ''; }
+function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
 
-      const statusCell = admin
-        ? `<select id="st-${id}" class="edit">
-             <option ${st==="Open"?"selected":""}>Open</option>
-             <option ${st==="InProgress"?"selected":""}>InProgress</option>
-             <option ${st==="Resolved"?"selected":""}>Resolved</option>
-           </select>`
-        : `<span class="badge ${st.replace(/\s+/g,"")}">${st}</span>`;
+async function safeJSON(res){
+  const text = await res.text();
+  try{ return JSON.parse(text); }
+  catch{
+    // If Cloudflare (or a 404) returns HTML, avoid the “Unexpected token '<'” crash
+    throw new Error(`Unexpected token '<', "${text.slice(0,20)}"... is not valid JSON`);
+  }
+}
 
-      const remarkCell = admin
-        ? `<div style="display:flex;gap:6px;align-items:center">
-             <input id="rm-${id}" class="edit" value="${remark.replace(/"/g,"&quot;")}" />
-             <button id="sv-${id}" class="btn small primary" onclick="saveRow('${id}')">Save</button>
-           </div>`
-        : (remark||"");
-
-      return `
-        <tr>
-          <td>${id}</td>
-          <td>${r["Date and Time Raised"]||""}</td>
-          <td>${r["Tower"]||""}</td>
-          <td>${r["Flat"]||""}</td>
-          <td>${r["Issue"]||""}</td>
-          <td>${r["Description"]||""}</td>
-          <td>${cellMedia(r["Media URL"])}</td>
-          <td>${statusCell}</td>
-          <td>${remarkCell}</td>
-          <td>${r["User ID"]||""}</td>
-          <td>${r["Date and Time Resolved"]||""}</td>
-          <td>${r["Time Taken"]||""}</td>
-          <td>${r["Feedback Rating"]||""}</td>
-        </tr>`;
-    }
-
-    function render(){
-      const tb=$("#grid tbody");
-      tb.innerHTML = state.all.map(rowHtml).join("");
-      // KPIs
-      const total=state.all.length;
-      const open=state.all.filter(x=>x.Status==="Open").length;
-      const inprog=state.all.filter(x=>x.Status==="InProgress").length;
-      const resolved=state.all.filter(x=>x.Status==="Resolved").length;
-      $("#kpiTotal").textContent=total;
-      $("#kpiOpen").textContent=open;
-      $("#kpiProgress").textContent=inprog;
-      $("#kpiResolved").textContent=resolved;
-      // (Avg time / rating are sample placeholders unless your GAS returns them precomputed)
-      $("#kpiAvgTime").textContent="0m";
-      const ratings=state.all.map(x=>Number(x["Feedback Rating"]||0)).filter(n=>!Number.isNaN(n));
-      $("#kpiAvgRating").textContent=ratings.length? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : "0";
-    }
-
-    // Save with animation
-    async function saveRow(id){
-      const stEl=$("#st-"+id), rmEl=$("#rm-"+id), btn=$("#sv-"+id);
-      const status=stEl?.value ?? "";
-      const remark=rmEl?.value ?? "";
-      btn.textContent="Saving…"; btn.disabled=true;
-
-      try{
-        const r=await fetch(API+"?mode=api&op=update",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ token:tok(), op:"update", id, status, remark })
-        });
-        const j=await r.json();
-        if(!j.ok) throw new Error(j.error||"Failed");
-        btn.textContent="Saved ✓";
-        setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; load(); },800);
-      }catch(e){
-        btn.textContent="Failed ✕";
-        setTimeout(()=>{ btn.textContent="Save"; btn.disabled=false; },1200);
-      }
-    }
-    window.saveRow=saveRow;
-
-    // Auto refresh
-    let timer=null;
-    $("#ar").onchange=()=>{ if($("#ar").checked){ timer=setInterval(load,60000);} else { clearInterval(timer);} };
-    if($("#ar").checked){ timer=setInterval(load,60000); }
-
-    // Start
-    load();
-  </script>
+// bootstrap
+(async function init(){
+  try{
+    await ensureSession();          // decides editability
+    await loadData();
+  }catch(ex){
+    alert('Network error while fetching data.\n' + ex.message);
+    $('#rows').innerHTML = `<tr><td colspan="14" style="text-align:center;padding:24px;color:#b91c1c;background:#fee2e2;border-top:1px solid #fecaca">Network error while fetching data.</td></tr>`;
+  }
+})();
+</script>
 </body>
 </html>
